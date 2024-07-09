@@ -1,3 +1,20 @@
+### 计划（maybe）
+
+- 划分数据集 
+- 载入数据
+- 选择模型（U-Net、DeepLab、FCN）训练循环，比较不同模型
+- 定义损失函数,选择优化器
+- 应用测试集评估模型性能，检查泛化能力，检验是否过拟合，调整超参数，评估指标（IoU、Dice coefficient
+- 设置模型保存和加载机制
+- 可视化
+- 实例分割? 全景分割?
+
+### 使用方法
+
+`data_split`->`data_load.py` 均可单独执行
+
+### 配置环境
+
 ```
 conda create -n group_work python=3.9
 conda activate image_processing
