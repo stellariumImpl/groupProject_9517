@@ -11,7 +11,8 @@
 
 ### 使用方法（现有，均可单独执行）
 
-`data_split` 
+`data_split.py` 
+
 `data_load.py` 
 
 ### 配置环境
