@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 from PIL import Image
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -77,7 +78,7 @@ def main():
             f"Batch shapes: Images {batch_images.shape}, IndexLabels {batch_indexlabels.shape}, Labels {batch_labels.shape}")
         print(f"IndexLabels unique values: {torch.unique(batch_indexlabels)}")
         print(f"Labels unique values: {torch.unique(batch_labels)}")
-        break   # 演示所用，训练时请删除此行
+        break  # 演示所用，训练时请删除此行
 
 
 if __name__ == '__main__':
