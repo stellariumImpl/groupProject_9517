@@ -7,7 +7,7 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 from data_split import WildScenesDataset
-from transforms import TrainTransform, TestTransform
+from utils.transforms import TrainTransform, TestTransform
 from PIL import Image
 
 
