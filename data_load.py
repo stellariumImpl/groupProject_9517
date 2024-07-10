@@ -22,7 +22,11 @@ class EnhancedWildScenesDataset(WildScenesDataset):
         label_path = self._data_frame['label'][index]
 
         image = Image.open(image_path).convert('RGB')
-        label = Image.open(label_path).convert('L')
+        # Use test_label_mapping to get both original and mapped labels
+        original_label, mapped_label = self.test_label_mapping(label_path)
+
+        # Convert numpy array to PIL Image for compatibility with transforms
+        label = Image.fromarray(mapped_label.astype(np.uint8))
 
         if self.transform is not None:
             image, label = self.transform(image, label)
