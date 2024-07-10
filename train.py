@@ -7,116 +7,103 @@ from data_load import EnhancedWildScenesDataset
 from tqdm import tqdm
 import numpy as np
 import os
-from sklearn.metrics import confusion_matrix
+import logging
+from utils.log import setup_logger, calculate_miou, save_checkpoint
 
-
-def calculate_miou(pred, target, num_classes):
-    pred = pred.flatten()
-    target = target.flatten()
-    cm = confusion_matrix(target, pred, labels=range(num_classes))
-    intersection = np.diag(cm)
-    union = np.sum(cm, axis=1) + np.sum(cm, axis=0) - np.diag(cm)
-    iou = intersection / union.astype(np.float32)
-    return np.mean(iou)
-
-
-def train_epoch(model, dataloader, criterion, optimizer, device):
+def train_epoch(model, dataloader, criterion, optimizer, device, num_classes):
+    """训练一个 epoch"""
     model.train()
     total_loss = 0
     total_miou = 0
+    num_batches = 0
 
     for images, labels in tqdm(dataloader, desc="Training"):
-        images = images.to(device)
-        labels = labels.to(device)
+        images, labels = images.to(device), labels.to(device)
 
         optimizer.zero_grad()
         outputs = model(images)['out']
-
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
 
         total_loss += loss.item()
-
         pred = torch.argmax(outputs, dim=1)
-        miou = calculate_miou(pred.cpu().numpy(), labels.cpu().numpy(), num_classes=18)
-        total_miou += miou
+        miou = calculate_miou(pred.cpu().numpy(), labels.cpu().numpy(), num_classes)
+        if not np.isnan(miou):
+            total_miou += miou
+            num_batches += 1
 
-    return total_loss / len(dataloader), total_miou / len(dataloader)
+    return total_loss / len(dataloader), total_miou / num_batches if num_batches > 0 else 0.0
 
-
-def validate_epoch(model, dataloader, criterion, device):
+def validate_epoch(model, dataloader, criterion, device, num_classes):
+    """验证一个 epoch"""
     model.eval()
     total_loss = 0
     total_miou = 0
 
     with torch.no_grad():
         for images, labels in tqdm(dataloader, desc="Validating"):
-            images = images.to(device)
-            labels = labels.to(device)
-
+            images, labels = images.to(device), labels.to(device)
             outputs = model(images)['out']
-
             loss = criterion(outputs, labels)
             total_loss += loss.item()
-
             pred = torch.argmax(outputs, dim=1)
-            miou = calculate_miou(pred.cpu().numpy(), labels.cpu().numpy(), num_classes=18)
+            miou = calculate_miou(pred.cpu().numpy(), labels.cpu().numpy(), num_classes)
             total_miou += miou
 
     return total_loss / len(dataloader), total_miou / len(dataloader)
 
-
-def save_checkpoint(model, optimizer, epoch, miou, filename):
-    checkpoint = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'miou': miou,
-    }
-    torch.save(checkpoint, filename)
-    print(f"Checkpoint saved: {filename}")
-
-
-def train(model, train_loader, val_loader, criterion, optimizer, num_epochs, device, save_dir):
+def train(model, train_loader, val_loader, criterion, optimizer, num_epochs, device, save_dir, num_classes):
+    """训练模型"""
     best_miou = 0
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     for epoch in range(num_epochs):
-        print(f"Epoch {epoch + 1}/{num_epochs}")
+        current_epoch = epoch + 1  # 当前 epoch 计数（从 1 开始）
+        logging.info(f"Epoch {current_epoch}/{num_epochs}")
 
-        train_loss, train_miou = train_epoch(model, train_loader, criterion, optimizer, device)
-        print(f"Training Loss: {train_loss:.4f}, Training mIoU: {train_miou:.4f}")
+        train_loss, train_miou = train_epoch(model, train_loader, criterion, optimizer, device, num_classes)
+        logging.info(f"Epoch {current_epoch} - Train Loss: {train_loss:.4f}, Train mIoU: {train_miou:.4f}")
 
-        val_loss, val_miou = validate_epoch(model, val_loader, criterion, device)
-        print(f"Validation Loss: {val_loss:.4f}, Validation mIoU: {val_miou:.4f}")
+        val_loss, val_miou = validate_epoch(model, val_loader, criterion, device, num_classes)
+        logging.info(f"Epoch {current_epoch} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}")
 
-        # 保存最佳模型
         if val_miou > best_miou:
             best_miou = val_miou
-            best_model_path = os.path.join(save_dir, 'best_model.pth')
+            best_model_path = os.path.join(save_dir, f'best_model_epoch_{current_epoch}.pth')
             torch.save(model.state_dict(), best_model_path)
-            print(f"Best model saved with mIoU: {best_miou:.4f}")
+            logging.info(f"Epoch {current_epoch} - Best model saved with mIoU: {best_miou:.4f}")
 
-        # 每5个epoch保存一次检查点
-        if (epoch + 1) % 5 == 0:
-            checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch_{epoch + 1}.pth')
-            save_checkpoint(model, optimizer, epoch, val_miou, checkpoint_path)
+        if current_epoch % 5 == 0:
+            checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch_{current_epoch}.pth')
+            save_checkpoint(model, optimizer, current_epoch, val_miou, checkpoint_path)
+            logging.info(f"Epoch {current_epoch} - Checkpoint saved")
 
+    logging.info(f"Training completed after {num_epochs} epochs.")
 
 if __name__ == "__main__":
+    # 设置日志
+    setup_logger('training.log')
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logging.info(f"Using device: {device}")
 
     # 数据加载
-    train_dataset = EnhancedWildScenesDataset('train')
-    val_dataset = EnhancedWildScenesDataset('valid')
+    train_loader = EnhancedWildScenesDataset.get_data_loader('train', batch_size=4)
+    val_loader = EnhancedWildScenesDataset.get_data_loader('valid', batch_size=4)
 
-    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4)
-    val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=4)
+    # # 检查数据集
+    # train_dataset = train_loader.dataset
+    # val_dataset = val_loader.dataset
+    #
+    # # 测试
+    # image, label = train_dataset[0]
+    # print(f"Image shape: {image.shape}, Label shape: {label.shape}")
 
     # 模型定义
-    model = deeplabv3_resnet50(num_classes=18)
+    num_classes = 18
+    model = deeplabv3_resnet50(num_classes=num_classes)
     model.to(device)
 
     # 损失函数和优化器
@@ -124,8 +111,8 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # 训练
-    num_epochs = 10
+    num_epochs = 30
     save_dir = 'model_checkpoints'
-    train(model, train_loader, val_loader, criterion, optimizer, num_epochs, device, save_dir)
+    train(model, train_loader, val_loader, criterion, optimizer, num_epochs, device, save_dir, num_classes)
 
-print("Training completed!")
+logging.info("Training completed!")
