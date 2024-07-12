@@ -58,9 +58,10 @@ class EnhancedWildScenesDataset(WildScenesDataset):
 
     def _load_color_map(self):
         # Assume class_dict.csv is in the same directory as this script
-        csv_path = os.path.join(os.path.dirname(__file__), 'class_dict.csv')
-        df = pd.read_csv(csv_path)
-        color_map = {row['traidId']: np.array([row['r'], row['g'], row['b']]) for _, row in df.iterrows()}
+        # csv_path = os.path.join(os.path.dirname(__file__), 'class_dict.csv')
+        # df = pd.read_csv(csv_path)
+        # color_map = {row['traidId']: np.array([row['r'], row['g'], row['b']]) for _, row in df.iterrows()}
+        color_map = {key: np.array(value) for key, value in EnhancedWildScenesDataset.color_map.items()}
         return color_map
 
     def _get_transform(self, dataset_type):
