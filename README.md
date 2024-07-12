@@ -11,9 +11,13 @@
 
 ### 使用方法（现有，均可单独执行）
 
-`data_split.py` 
+- `data_split.py` 
 
-`data_load.py` 
+- `data_load.py` 
+
+- `train.py` 
+
+- `test.py` 需要執行model_checkpoints目錄下的脚本
 
 ### 配置环境
 
