@@ -13,7 +13,7 @@ from utils.metrics import calculate_miou, calculate_confusion_matrix, calculate_
 import torch.nn as nn
 from collections import OrderedDict
 from data_load import EnhancedWildScenesDataset
-
+from torchvision.models.segmentation import deeplabv3_resnet101
 
 
 def is_pil_image(img):
