@@ -3,11 +3,11 @@ import os
 import sklearn
 from PIL import Image
 import numpy as np
-
+import logging
 
 class WildScenesDataset:
     _data_list_dir = os.path.join('datasets', 'data_list')
-    _cvs_files = {
+    _csv_files = {
         'train': os.path.join(_data_list_dir, 'train.csv'),
         'valid': os.path.join(_data_list_dir, 'valid.csv'),
         'test': os.path.join(_data_list_dir, 'test.csv'),
@@ -39,29 +39,35 @@ class WildScenesDataset:
     def __init__(self, dataset_type, transform=None):
         assert dataset_type in ('train', 'valid', 'test')
         self._dataset_type = dataset_type
-        self._data_frame = pd.read_csv(WildScenesDataset._cvs_files[self._dataset_type])
+        self._data_frame = pd.read_csv(WildScenesDataset._csv_files[self._dataset_type])
         self._transform = transform
 
     def __len__(self):
         return len(self._data_frame)
 
     def __getitem__(self, index):
-        image_path = self._data_frame['image'][index]
-        label_path = self._data_frame['label'][index]
+        if index >= len(self):
+            raise IndexError(f"Index {index} out of bounds for dataset of size {len(self)}")
+        try:
+            image_path = self._data_frame['image'].iloc[index]
+            label_path = self._data_frame['label'].iloc[index]
 
-        image = Image.open(image_path).convert('RGB')
-        label = Image.open(label_path).convert('L')
-        # 将灰度图转换为Numpy数组
-        label_np = np.array(label)
+            image = Image.open(image_path).convert('RGB')
+            label = Image.open(label_path).convert('L')
+            # 将灰度图转换为Numpy数组
+            label_np = np.array(label)
 
-        # 将标签索引映射到训练标识（trainId）值
-        label_trainId = np.vectorize(lambda x: self._label_to_trainid.get(x, 255))(label_np)
+            # 将标签索引映射到训练标识（trainId）值
+            label_trainId = np.vectorize(lambda x: self._label_to_trainid.get(x, 255))(label_np)
 
-        if self._transform is not None:
-            for t in self._transform:
-                image, label_trainId = t(image, label_trainId)
+            if self._transform is not None:
+                for t in self._transform:
+                    image, label_trainId = t(image, label_trainId)
 
-        return image, label_trainId
+            return image, label_trainId
+        except Exception as e:
+            logging.error(f"Error loading item at index {index}: {str(e)}")
+            raise
 
     @staticmethod
     def _get_image_label_dir():
@@ -124,9 +130,9 @@ class WildScenesDataset:
         df_test = df[train_size + valid_size:]
 
         # Save train, valid, and test sets to CSV files
-        df_train[['image', 'label']].to_csv(os.path.join(WildScenesDataset._cvs_files['train']), index=False)
-        df_valid[['image', 'label']].to_csv(os.path.join(WildScenesDataset._cvs_files['valid']), index=False)
-        df_test[['image', 'label']].to_csv(os.path.join(WildScenesDataset._cvs_files['test']), index=False)
+        df_train[['image', 'label']].to_csv(os.path.join(WildScenesDataset.csv['train']), index=False)
+        df_valid[['image', 'label']].to_csv(os.path.join(WildScenesDataset.csv['valid']), index=False)
+        df_test[['image', 'label']].to_csv(os.path.join(WildScenesDataset.csv['test']), index=False)
 
     # 测试用
     @staticmethod
