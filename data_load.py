@@ -10,6 +10,23 @@ from data_split import WildScenesDataset
 from utils.transforms import TrainTransform, TestTransform
 from PIL import Image
 
+color_map = {
+    1: [224, 31, 77],  # Bush
+    2: [64, 180, 78],  # Dirt
+    3: [26, 127, 127], # Fence
+    4: [127, 127, 127],# Grass
+    5: [145, 24, 178], # Gravel
+    6: [125, 128, 16], # Log
+    7: [251, 225, 48], # Mud
+    8: [248, 190, 190],# Other-object
+    9: [89, 239, 239], # Other-terrain
+    11: [173, 255, 196],# Rock
+    12: [19, 0, 126],  # Sky
+    13: [167, 110, 44],# Structure
+    14: [208, 245, 71],# Tree-foliage
+    15: [238, 47, 227],# Tree-trunk
+    17: [40, 127, 198] # Water
+}
 
 class EnhancedWildScenesDataset(WildScenesDataset):
     def __init__(self, dataset_type, transform=None):
@@ -31,6 +48,12 @@ class EnhancedWildScenesDataset(WildScenesDataset):
         if self.transform is not None:
             image, label = self.transform(image, label)
 
+        # Verify shapes
+        assert image.shape[0] == 3, f"Image should have 3 channels, got {image.shape[0]}"
+        assert image.shape[1] == image.shape[2], f"Image should be square, got shape {image.shape}"
+        assert label.shape == image.shape[
+                              1:], f"Label shape {label.shape} doesn't match image shape {image.shape[1:]}"
+
         return image, label
 
     def _load_color_map(self):
@@ -48,7 +71,10 @@ class EnhancedWildScenesDataset(WildScenesDataset):
         else:
             raise ValueError('Invalid dataset type')
 
-    def get_color_coded_label(self, label_trainId):
+    color_map = color_map
+
+    @staticmethod
+    def get_color_coded_label(label_trainId):
         """
         Convert trainId label to RGB color-coded label.
 
@@ -58,7 +84,7 @@ class EnhancedWildScenesDataset(WildScenesDataset):
         height, width = label_trainId.shape
         label_RGB = np.zeros((height, width, 3), dtype=np.uint8)
 
-        for trainId, color in self.color_map.items():
+        for trainId, color in EnhancedWildScenesDataset.color_map.items():
             label_RGB[label_trainId == trainId] = color
 
         return label_RGB
