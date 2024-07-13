@@ -11,7 +11,7 @@ from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calcul
 from utils.losses import CombinedLoss
 from models.custom_deeplabv3 import CustomDeepLabV3
 from models.custom_mask2former import CustomMask2Former
-from models.dense_unet import DenseUNet, TransitionUp, DenseBlock
+from models.custom_unet import UNet, DoubleConv
 from PIL import Image
 import torch.nn as nn
 import torch.nn.functional as F
@@ -235,7 +235,7 @@ if __name__ == "__main__":
     # 选择模型
     # model = CustomDeepLabV3(num_classes=num_classes).to(device)
     model = CustomMask2Former(num_classes=num_classes).to(device)
-    # model = DenseUNet(in_channels=3, num_classes=num_classes, pretrained=True).to(device)
+    # model = UNet(in_channels=3, num_classes=num_classes).to(device)
 
     # 选择损失函数
     # criterion = FocalLoss(alpha=1, gamma=2)
