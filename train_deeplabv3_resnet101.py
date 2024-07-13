@@ -10,7 +10,8 @@ import logging
 from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calculate_dice_coefficient
 from utils.losses import CombinedLoss
 from models.custom_deeplabv3 import CustomDeepLabV3
-from models.dense_unet import DenseUNet, TransitionUp, DenseBlock
+from models.custom_unet import DoubleConv, UNet
+from models.custom_mask2former import CustomMask2Former
 from PIL import Image
 import torch.nn as nn
 import torch.nn.functional as F
