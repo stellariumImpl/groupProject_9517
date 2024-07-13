@@ -16,6 +16,7 @@ from PIL import Image
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+from utils.log import setup_logger, save_checkpoint
 
 
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
@@ -63,6 +64,7 @@ def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_
             total_pixel_acc / num_batches if num_batches > 0 else 0.0,
             total_dice / num_batches if num_batches > 0 else 0.0)
 
+
 def validate_epoch(model, dataloader, criterion, device, num_classes):
     model.eval()
     total_loss = 0
@@ -96,27 +98,6 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
             total_miou / num_batches,
             total_pixel_acc / num_batches,
             total_dice / num_batches)
-
-def save_checkpoint(model, optimizer, epoch, metrics, filename):
-    # 保存检查点
-    state = {
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'epoch': epoch,
-        'metrics': metrics
-    }
-    torch.save(state, filename)
-
-
-def setup_logger(log_file):
-    # 设置日志记录器
-    logging.basicConfig(filename=log_file, level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s')
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)
 
 
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir, num_classes):
@@ -165,15 +146,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
     return best_model_path
 
 
-# def print_model_channels(model):
-#     def hook(module, input, output):
-#         print(f"{module.__class__.__name__}: Input shape: {input[0].shape}, Output shape: {output.shape}")
-#
-#     for name, layer in model.named_modules():
-#         if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d, DenseBlock, TransitionUp)):
-#             layer.register_forward_hook(hook)
-
-
 if __name__ == "__main__":
     setup_logger('training.log')
 
@@ -183,25 +155,12 @@ if __name__ == "__main__":
     train_loader = EnhancedWildScenesDataset.get_data_loader('train', batch_size=8)
     val_loader = EnhancedWildScenesDataset.get_data_loader('valid', batch_size=8)
 
-    # test_loader = EnhancedWildScenesDataset.get_data_loader('test', batch_size=8)
-
     num_classes = 18  # 根据您的数据集调整这个值
 
     # 选择模型
     # model = CustomDeepLabV3(num_classes=num_classes).to(device)
     # model = CustomMask2Former(num_classes=num_classes).to(device)
     model = UNet(in_channels=3, num_classes=num_classes).to(device)
-    # print_model_channels(model)
-    # dummy_input = torch.randn(1, 3, 256, 256).to(device)
-    # _ = model(dummy_input)
-    #
-    # # Use a small batch size for testing
-    # test_input = torch.randn(1, 3, 256, 256).to(device)
-    # try:
-    #     output = model(test_input)
-    #     print(f"Model output shape: {output.shape}")
-    # except Exception as e:
-    #     print(f"Error during forward pass: {e}")
 
     # 选择损失函数
     # criterion = FocalLoss(alpha=1, gamma=2)
@@ -229,3 +188,7 @@ if __name__ == "__main__":
                             num_epochs, device, save_dir, num_classes)
 
     logging.info("Training and prediction completed!")
+
+    # 分割质量：模型只识别出了图像底部的某些区域, 而且分类似乎不太准确。大部分区域被标记为同一类别(红色), 这表明模型没有很好地学习到不同类别的特征。
+    # 黑色区域：图像上半部分完全是黑色的, 这可能是由于数据预处理或模型输出处理中的问题。
+    # 细节丢失：树木、枝叶等细节完全没有被识别出来, 只有粗略的区域划分。
