@@ -1,7 +1,9 @@
 import torch
+import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import OneCycleLR
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.cuda.amp import GradScaler, autocast
+from transformers import Mask2FormerForUniversalSegmentation
 from data_load import EnhancedWildScenesDataset
 from tqdm import tqdm
 import numpy as np
@@ -9,14 +11,41 @@ import os
 import logging
 from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calculate_dice_coefficient
 from utils.losses import CombinedLoss
-from models.custom_deeplabv3 import CustomDeepLabV3
-from models.custom_mask2former import CustomMask2Former
-from models.custom_unet import UNet, DoubleConv
-from PIL import Image
-import torch.nn as nn
+from utils.log import setup_logger, save_checkpoint
 import torch.nn.functional as F
 import math
-from utils.log import setup_logger, save_checkpoint
+
+
+class CustomMask2Former(nn.Module):
+    def __init__(self, num_classes):
+        super(CustomMask2Former, self).__init__()
+        self.mask2former = Mask2FormerForUniversalSegmentation.from_pretrained(
+            "facebook/mask2former-swin-base-coco-panoptic")
+
+        # 冻结所有参数
+        for param in self.mask2former.parameters():
+            param.requires_grad = False
+
+        # 解冻最后几层（这里我们解冻最后10个模块）
+        trainable_layers = list(self.mask2former.named_children())[-10:]
+        for name, layer in trainable_layers:
+            for param in layer.parameters():
+                param.requires_grad = True
+
+        # 修改输出层以适应您的类别数
+        self.mask2former.config.num_labels = num_classes
+        if hasattr(self.mask2former, 'class_predictor'):
+            in_features = self.mask2former.class_predictor.in_features
+            self.mask2former.class_predictor = nn.Linear(in_features, num_classes)
+
+        # 添加一个额外的卷积层来处理 100 通道的输入
+        self.extra_conv = nn.Conv2d(100, num_classes, kernel_size=3, padding=1)
+
+    def forward(self, pixel_values):
+        outputs = self.mask2former(pixel_values=pixel_values)
+        masks = outputs.masks_queries_logits  # Shape: [batch_size, 100, height, width]
+        masks = self.extra_conv(masks)  # Shape: [batch_size, num_classes, height, width]
+        return masks
 
 
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
@@ -34,62 +63,22 @@ def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_
 
         with torch.cuda.amp.autocast():
             outputs = model(images)
-            # outputs = outputs['out'] if isinstance(outputs, dict) else outputs
 
-            # if len(labels.shape) == 4 and labels.shape[1] > 1:
-            #     labels = torch.argmax(labels, dim=1)
+            if outputs.shape[-2:] != labels.shape[-2:]:
+                outputs = F.interpolate(outputs, size=labels.shape[-2:],
+                                        mode='bilinear', align_corners=False)
 
-            # if outputs.shape[2:] != labels.shape[1:]:
-            #     outputs = F.interpolate(outputs, size=labels.shape[1:], mode='bilinear', align_corners=True)
-
-            # print(f"Outputs type: {type(outputs)}")
-            # print(f"Outputs attributes: {dir(outputs)}")
-            # print(f"Labels shape: {labels.shape}")
-
-            # 检查outputs中可能包含分割结果的属性
-            if hasattr(outputs, 'class_queries_logits'):
-                segmentation_output = outputs.class_queries_logits
-            elif hasattr(outputs, 'segmentation_logits'):
-                segmentation_output = outputs.segmentation_logits
-            elif hasattr(outputs, 'masks_queries_logits'):
-                segmentation_output = outputs.masks_queries_logits
-            else:
-                raise ValueError(
-                    f"Unable to find appropriate segmentation output. Available attributes: {dir(outputs)}")
-
-            # print(f"Segmentation output shape: {segmentation_output.shape}")
-
-            # 如果输出是3D的 [batch_size, num_queries, num_classes]
-            if len(segmentation_output.shape) == 3:
-                batch_size, num_queries, num_classes = segmentation_output.shape
-                # 我们需要将这个输出转换为像素级的预测
-                # 这里我们假设每个query对应图像的一个区域
-                # 获取图像的高度和宽度
-                height, width = labels.shape[-2:]
-
-                # 计算最接近的正方形网格大小
-                grid_size = int(math.ceil(math.sqrt(num_queries)))
-                segmentation_output = segmentation_output.permute(0, 2, 1).view(batch_size, num_classes, grid_size,
-                                                                                grid_size)
-
-            # print(f"Reshaped segmentation output shape: {segmentation_output.shape}")
-
-            # 确保输出和标签有相同的空间维度
-            if segmentation_output.shape[-2:] != labels.shape[-2:]:
-                segmentation_output = nn.functional.interpolate(segmentation_output, size=labels.shape[-2:],
-                                                                mode='bilinear', align_corners=False)
-
-            loss = criterion(segmentation_output, labels)
-            # loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels)
 
         scaler.scale(loss).backward()
+
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
         scaler.step(optimizer)
         scaler.update()
 
-        scheduler.step()
-
         total_loss += loss.item()
-        pred = torch.argmax(segmentation_output, dim=1)
+        pred = torch.argmax(outputs, dim=1)
         miou = calculate_miou_train(pred.cpu().numpy(), labels.cpu().numpy(), num_classes)
         pixel_acc = calculate_pixel_accuracy(pred.cpu().numpy(), labels.cpu().numpy())
         dice = calculate_dice_coefficient(pred.cpu().numpy(), labels.cpu().numpy(), num_classes)
@@ -117,49 +106,15 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
         for images, labels in tqdm(dataloader, desc="Validating"):
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
-            # outputs = outputs['out'] if isinstance(outputs, dict) else outputs
 
-            # print(f"Validation - Outputs type: {type(outputs)}")
-            # print(f"Validation - Outputs attributes: {dir(outputs)}")
-            # print(f"Validation - Labels shape: {labels.shape}")
+            if outputs.shape[-2:] != labels.shape[-2:]:
+                outputs = F.interpolate(outputs, size=labels.shape[-2:],
+                                        mode='bilinear', align_corners=False)
 
-            # 提取分割输出
-            if hasattr(outputs, 'class_queries_logits'):
-                segmentation_output = outputs.class_queries_logits
-            elif hasattr(outputs, 'masks_queries_logits'):
-                segmentation_output = outputs.masks_queries_logits
-            else:
-                raise ValueError(
-                    f"Unable to find appropriate segmentation output. Available attributes: {dir(outputs)}")
-
-            # print(f"Validation - Segmentation output shape: {segmentation_output.shape}")
-
-            # 如果输出是3D的 [batch_size, num_queries, num_classes]
-            if len(segmentation_output.shape) == 3:
-                batch_size, num_queries, num_classes = segmentation_output.shape
-                # 获取图像的高度和宽度
-                height, width = labels.shape[-2:]
-
-                # 计算最接近的正方形网格大小
-                grid_size = int(math.ceil(math.sqrt(num_queries)))
-
-                # 重塑输出为 [batch_size, num_classes, grid_size, grid_size]
-                segmentation_output = segmentation_output.permute(0, 2, 1).view(batch_size, num_classes, grid_size,
-                                                                                grid_size)
-
-                # 调整大小以匹配标签的尺寸
-                segmentation_output = F.interpolate(segmentation_output, size=(height, width), mode='bilinear',
-                                                    align_corners=False)
-
-            # print(f"Validation - Reshaped segmentation output shape: {segmentation_output.shape}")
-
-            if len(labels.shape) == 4 and labels.shape[1] > 1:
-                labels = torch.argmax(labels, dim=1)
-
-            loss = criterion(segmentation_output, labels)
+            loss = criterion(outputs, labels)
 
             total_loss += loss.item()
-            pred = torch.argmax(segmentation_output, dim=1)
+            pred = torch.argmax(outputs, dim=1)
             miou = calculate_miou_train(pred.cpu().numpy(), labels.cpu().numpy(), num_classes)
             pixel_acc = calculate_pixel_accuracy(pred.cpu().numpy(), labels.cpu().numpy())
             dice = calculate_dice_coefficient(pred.cpu().numpy(), labels.cpu().numpy(), num_classes)
@@ -176,7 +131,6 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
 
 
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir, num_classes):
-    # 训练模型的主函数
     best_miou = 0
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -196,6 +150,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
             model, val_loader, criterion, device, num_classes)
         logging.info(f"Epoch {current_epoch} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}, "
                      f"Val Pixel Acc: {val_pixel_acc:.4f}, Val Dice: {val_dice:.4f}")
+
+        scheduler.step(val_loss)  # 使用验证损失来调整学习率
 
         metrics = {
             'miou': val_miou,
@@ -232,32 +188,16 @@ if __name__ == "__main__":
 
     num_classes = 18  # 根据您的数据集调整这个值
 
-    # 选择模型
-    # model = CustomDeepLabV3(num_classes=num_classes).to(device)
     model = CustomMask2Former(num_classes=num_classes).to(device)
-    # model = UNet(in_channels=3, num_classes=num_classes).to(device)
 
-    # 选择损失函数
-    # criterion = FocalLoss(alpha=1, gamma=2)
     criterion = CombinedLoss(weight_focal=1.0, weight_dice=0.5)
 
-    # 选择优化器
-    # optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0001, nesterov=True)
-    optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.01)
+    # 只优化未冻结的参数
+    optimizer = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-5, weight_decay=0.01)
+
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
 
     num_epochs = 60
-    steps_per_epoch = len(train_loader)
-    scheduler = OneCycleLR(
-        optimizer,
-        max_lr=0.01,
-        steps_per_epoch=steps_per_epoch,
-        epochs=num_epochs,
-        pct_start=0.3,
-        anneal_strategy='cos',
-        div_factor=25,
-        final_div_factor=1000
-    )
-
     save_dir = 'model_checkpoints'
     best_model_path = train(model, train_loader, val_loader, criterion, optimizer, scheduler,
                             num_epochs, device, save_dir, num_classes)
