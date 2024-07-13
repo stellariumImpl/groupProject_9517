@@ -8,13 +8,13 @@ import os
 import logging
 from data_split import WildScenesDataset
 from utils.transforms import PairNormalizeToTensor, PairResize, PairCrop
+from models.custom_unet import UNet
+from models.custom_mask2former import CustomMask2Former
 from models.custom_deeplabv3 import CustomDeepLabV3
 from utils.metrics import calculate_miou, calculate_confusion_matrix, calculate_dice_coefficient
 import torch.nn as nn
 from collections import OrderedDict
 from data_load import EnhancedWildScenesDataset
-from torchvision.models.segmentation import deeplabv3_resnet101
-
 
 def is_pil_image(img):
     return isinstance(img, Image.Image)
@@ -183,13 +183,12 @@ def save_comparison_image(im, lb, pred, batch_cm, index, output_dir):
     plt.savefig(f'{output_dir}/comparison_image_{index}.png')
     plt.close(fig)
 
-
 def get_model(model_name, in_channels, num_classes, device, load_weight=None, adjust_classifier=False):
     """
     获取并初始化模型
 
     Args:
-    model_name (str): 模型名称，例如 'custom_deeplabv3'
+    model_name (str): 模型名称，例如 'custom_deeplabv3', 'unet', 或 'custom_mask2former'
     in_channels (int): 输入通道数
     num_classes (int): 类别数量
     device (torch.device): 使用的设备（CPU 或 GPU）
@@ -201,6 +200,10 @@ def get_model(model_name, in_channels, num_classes, device, load_weight=None, ad
     """
     if model_name.lower() == 'custom_deeplabv3':
         model = CustomDeepLabV3(num_classes=num_classes).to(device)
+    elif model_name.lower() == 'unet':
+        model = UNet(in_channels=in_channels, num_classes=num_classes).to(device)
+    elif model_name.lower() == 'custom_mask2former':
+        model = CustomMask2Former(num_classes=num_classes).to(device)
     else:
         raise ValueError(f"Unsupported model name: {model_name}")
 
@@ -213,15 +216,33 @@ def get_model(model_name, in_channels, num_classes, device, load_weight=None, ad
                 state_dict = checkpoint
 
             # 检查分类器的权重形状
-            classifier_weight = state_dict['deeplabv3.classifier.4.4.weight']
-            classifier_bias = state_dict['deeplabv3.classifier.4.4.bias']
+            if model_name.lower() == 'custom_deeplabv3':
+                classifier_key = 'classifier.4.weight'
+                bias_key = 'classifier.4.bias'
+            elif model_name.lower() == 'unet':
+                classifier_key = 'outc.weight'
+                bias_key = 'outc.bias'
+            elif model_name.lower() == 'custom_mask2former':
+                classifier_key = 'mask2former.class_predictor.weight'
+                bias_key = 'mask2former.class_predictor.bias'
+
+            if classifier_key not in state_dict:
+                raise KeyError(f"Classifier key '{classifier_key}' not found in the loaded state dict. "
+                               f"This weight file might not be compatible with the {model_name} model.")
+
+            classifier_weight = state_dict[classifier_key]
+            classifier_bias = state_dict[bias_key]
+
             loaded_num_classes = classifier_weight.size(0)
 
             if loaded_num_classes != num_classes:
                 if adjust_classifier:
                     logging.info(f"Adjusting classifier from {loaded_num_classes} to {num_classes} classes.")
                     # 调整分类器权重
-                    new_classifier_weight = nn.Parameter(torch.randn(num_classes, classifier_weight.size(1), 1, 1))
+                    if model_name.lower() in ['custom_deeplabv3', 'unet']:
+                        new_classifier_weight = nn.Parameter(torch.randn(num_classes, classifier_weight.size(1), 1, 1))
+                    else:  # custom_mask2former
+                        new_classifier_weight = nn.Parameter(torch.randn(num_classes, classifier_weight.size(1)))
                     new_classifier_bias = nn.Parameter(torch.randn(num_classes))
 
                     # 复制共同的类别
@@ -229,8 +250,8 @@ def get_model(model_name, in_channels, num_classes, device, load_weight=None, ad
                     new_classifier_weight.data[:min_classes] = classifier_weight.data[:min_classes]
                     new_classifier_bias.data[:min_classes] = classifier_bias.data[:min_classes]
 
-                    state_dict['deeplabv3.classifier.4.4.weight'] = new_classifier_weight
-                    state_dict['deeplabv3.classifier.4.4.bias'] = new_classifier_bias
+                    state_dict[classifier_key] = new_classifier_weight
+                    state_dict[bias_key] = new_classifier_bias
                 else:
                     raise ValueError(
                         f"Model checkpoint has {loaded_num_classes} classes, but current model has {num_classes} classes. Set adjust_classifier=True to adjust the classifier.")
@@ -249,7 +270,6 @@ def get_model(model_name, in_channels, num_classes, device, load_weight=None, ad
 
     return model
 
-
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -260,6 +280,7 @@ if __name__ == '__main__':
     adjust_classifier = False
 
     try:
+        # 請手動選擇模型名稱 custom_DeepLabV3 custom_mask2former unet
         mod = get_model('custom_deeplabv3', in_channels=3, num_classes=num_classes,
                         device=dev, load_weight=load_file, adjust_classifier=adjust_classifier)
         logging.info("Model loaded successfully")
