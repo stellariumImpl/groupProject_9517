@@ -13,7 +13,7 @@ class CustomMask2Former(nn.Module):
 
         self.mask2former.config.num_labels = num_classes
 
-        # 修改输出层以适应您的类别数
+        # 修改输出层以适应类别数
         if hasattr(self.mask2former, 'class_predictor'):
             in_features = self.mask2former.class_predictor.in_features
             self.mask2former.class_predictor = nn.Linear(in_features, num_classes)
