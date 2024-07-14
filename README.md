@@ -30,7 +30,7 @@
 
 ```
 conda create -n group_work python=3.9
-conda activate image_processing
+conda activate group_work
 conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 pip install -r requirements.txt
 # 然后会出现一些报错 其实无所谓 如果需要解决
