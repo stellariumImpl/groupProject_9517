@@ -8,7 +8,7 @@ class CustomDeepLabV3(nn.Module):
     def __init__(self, num_classes):
         super(CustomDeepLabV3, self).__init__()
         # self.deeplabv3 = deeplabv3_resnet101(pretrained=True)
-        self.deeplabv3 = deeplabv3_resnet101(weights=models.segmentation.DeepLabV3_ResNet101_Weights.DEFAULT)
+        self.deeplabv3 = deeplabv3_resnet101(pretrained=True)
         self.deeplabv3.classifier[4] = nn.Sequential(
             nn.Conv2d(256, 256, kernel_size=3, padding=1),
             nn.BatchNorm2d(256),
