@@ -5,37 +5,41 @@ from PIL import Image
 import numpy as np
 import logging
 
+
 class WildScenesDataset:
+    root_dirs = [
+        os.path.join('..', 'data', 'WildScenes', 'WildScenes2d', 'V-01'),
+        os.path.join('..', 'data', 'WildScenes', 'WildScenes2d', 'V-02'),
+        os.path.join('..', 'data', 'WildScenes', 'WildScenes2d', 'V-03')
+    ]
     _data_list_dir = os.path.join('datasets', 'data_list')
     _csv_files = {
         'train': os.path.join(_data_list_dir, 'train.csv'),
         'valid': os.path.join(_data_list_dir, 'valid.csv'),
         'test': os.path.join(_data_list_dir, 'test.csv'),
     }
-
-    # Pixel values are label index values (class indices [0,14] as assigned with classes sorted alphabetically by class name).
-    # Define the mapping from label index to trainId
+    csv = _csv_files
     _label_to_trainid = {
-        1: 0,  # Asphalt
-        2: 1,  # Bush *
-        3: 2,  # Dirt *
-        4: 3,  # Fence *
-        5: 4,  # Grass *
-        6: 5,  # Gravel *
-        7: 6,  # Log *
-        8: 7,  # Mud *
-        9: 8,  # Other-object *
-        10: 9,  # Other-terrain *
-        11: 10,  # Pole
-        12: 11,  # Rock *
-        13: 12,  # Sky *
-        14: 13,  # Structure *
-        15: 14,  # Tree-foliage *
-        16: 15,  # Tree-trunk *
-        17: 16,  # Vehicle
-        18: 17,  # Water *
+        0: 15,  # 背景类
+        1: 16,  # 忽略类
+        2: 0,  # Bush
+        3: 1,  # Dirt
+        4: 2,  # Fence
+        5: 3,  # Grass
+        6: 4,  # Gravel
+        7: 5,  # Log
+        8: 6,  # Mud
+        9: 7,  # Other-Object
+        10: 8,  # Other-terrain
+        11: 16,  # 忽略类
+        12: 9,  # Rock
+        13: 10,  # Sky
+        14: 11,  # Structure
+        15: 12,  # Tree-foliage
+        16: 13,  # Tree-trunk
+        17: 16,  # 忽略类
+        18: 14,  # Water
     }
-
     def __init__(self, dataset_type, transform=None):
         assert dataset_type in ('train', 'valid', 'test')
         self._dataset_type = dataset_type
@@ -67,7 +71,6 @@ class WildScenesDataset:
             return image, label_trainId
         except Exception as e:
             logging.error(f"Error loading item at index {index}: {str(e)}")
-            raise
 
     @staticmethod
     def _get_image_label_dir():
@@ -100,13 +103,38 @@ class WildScenesDataset:
         :param shuffle: Whether to shuffle the dataset, default True
         :return: None
         """
-        g = WildScenesDataset._get_image_label_dir()  # Get generator
-        abspaths = list(g)  # Convert generator to list
+        # Ensure the directory exists
+        data_list_dir = WildScenesDataset._data_list_dir
+        if not os.path.exists(data_list_dir):
+            os.makedirs(data_list_dir)
+            print(f"Created directory: {data_list_dir}")
+
+        all_image_paths = []
+        all_label_paths = []
+
+        # Traverse all root directories to collect image and label paths
+        for root_dir in WildScenesDataset.root_dirs:
+            image_base = os.path.join(root_dir, 'image')
+            label_base = os.path.join(root_dir, 'indexLabel')
+
+            if not os.path.exists(image_base) or not os.path.exists(label_base):
+                print(f"Error: Image or label directory does not exist in {root_dir}")
+                continue
+
+            for image in os.listdir(image_base):
+                image_origin = os.path.join(image_base, image)
+                image_label = os.path.join(label_base, image)
+
+                if not (os.path.isfile(image_label) and os.path.exists(image_label)):
+                    print(f"Warning: Skipping invalid file pair {image_origin}, {image_label}")
+                    continue
+
+                all_image_paths.append(image_origin)
+                all_label_paths.append(image_label)
 
         # Create DataFrame with image and label paths
         df = pd.DataFrame(
-            data=abspaths,
-            columns=['image', 'label']
+            data={'image': all_image_paths, 'label': all_label_paths}
         )
 
         # Sort DataFrame by filename (assumed to be timestamp in a sortable format)
@@ -134,7 +162,7 @@ class WildScenesDataset:
         df_valid[['image', 'label']].to_csv(os.path.join(WildScenesDataset.csv['valid']), index=False)
         df_test[['image', 'label']].to_csv(os.path.join(WildScenesDataset.csv['test']), index=False)
 
-    # 测试用
+    # 测试語義分割時用
     @staticmethod
     def test_label_mapping(label_path):
         """
@@ -152,24 +180,29 @@ class WildScenesDataset:
 
         return label_np, label_trainId
 
-
-if __name__ == '__main__':
+if __name__=='__main__':
     # Example usage
-    root_dir = os.path.join('..', 'WildScenes_Dataset-61gd5a0t-', 'data', 'WildScenes', 'WildScenes2d', 'V-01')
-    WildScenesDataset.image_file_base = os.path.join(root_dir, 'image')
-    WildScenesDataset.label_file_base = os.path.join(root_dir, 'indexLabel')
-    WildScenesDataset.make_data_list()
+    root_dirs = [
+        os.path.join('..', 'data', 'WildScenes', 'WildScenes2d', 'V-01'),
+        os.path.join('..', 'data', 'WildScenes', 'WildScenes2d', 'V-02'),
+        os.path.join('..', 'data', 'WildScenes', 'WildScenes2d', 'V-03')
+    ]
 
-    # Test label mapping 测试labelIndex里的第一张
-    test_label_path = os.path.join(WildScenesDataset.label_file_base,
-                                   '1623377790-818434554.png')  # Replace with an actual image name
-    original_label, mapped_label = WildScenesDataset.test_label_mapping(test_label_path)
+    for root_dir in root_dirs:
+        WildScenesDataset.image_file_base = os.path.join(root_dir, 'image')
+        WildScenesDataset.label_file_base = os.path.join(root_dir, 'indexLabel')
+        WildScenesDataset.make_data_list()
 
-    print("Original label array (shape: {}):".format(original_label.shape))
-    print(original_label)
-    print("\nMapped trainId array (shape: {}):".format(mapped_label.shape))
-    print(mapped_label)
+    # Test label mapping for the first image in labelIndex
+    # test_label_path = os.path.join(WildScenesDataset.label_file_base,
+    #                             '1623370408-092005506.png')  # Replace with an actual image name
+    # original_label, mapped_label = WildScenesDataset.test_label_mapping(test_label_path)
 
-    # Optional: print unique values in each array
-    print("\nUnique values in original label array:", np.unique(original_label))
-    print("Unique values in mapped trainId array:", np.unique(mapped_label))
+    # print(f"Original label array (shape: {original_label.shape}):")
+    # print(original_label)
+    # print(f"\nMapped trainId array (shape: {mapped_label.shape}):")
+    # print(mapped_label)
+
+    # # Optional: print unique values in each array
+    # print("\nUnique values in original label array:", np.unique(original_label))
+    # print("Unique values in mapped trainId array:", np.unique(mapped_label))

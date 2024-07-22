@@ -6,7 +6,8 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 from data_split import WildScenesDataset
-from utils.transforms import TrainTransform, TestTransform
+from utils.transforms import TrainTransform, TestTransform, AdvancedAugmentation
+from torchvision.transforms import functional as TF
 
 color_map = {
     0: [224, 31, 77],  # Bush
@@ -27,6 +28,25 @@ color_map = {
     15: [0, 0, 0],      # 背景类（黑色）
     16: [128, 128, 128],  # 忽略类（灰色）
 }
+
+def custom_collate(batch):
+        images = []
+        masks = []
+        for item in batch:
+            image, mask = item
+            
+            # 确保图像大小一致（使用 224x224 或你希望的任何大小）
+            image = TF.resize(image, (224, 224))
+            mask = TF.resize(mask.unsqueeze(0), (224, 224), interpolation=TF.InterpolationMode.NEAREST).squeeze(0)
+            
+            images.append(image)
+            masks.append(mask)
+        
+        # 堆叠图像和掩码
+        images = torch.stack(images, 0)
+        masks = torch.stack(masks, 0)
+    
+        return images, masks
 
 class EnhancedWildScenesDataset(WildScenesDataset):
     def __init__(self, dataset_type, transform=None):
@@ -60,7 +80,7 @@ class EnhancedWildScenesDataset(WildScenesDataset):
 
     def _get_transform(self, dataset_type):
         if dataset_type == 'train':
-            return TrainTransform()
+            return AdvancedAugmentation()
         elif dataset_type in ['valid', 'test']:
             return TestTransform()
         else:
@@ -79,22 +99,23 @@ class EnhancedWildScenesDataset(WildScenesDataset):
             label_RGB[label_trainId == trainId] = color
         return label_RGB
 
+
     def get_data_loader(dataset_type, batch_size=4):
         dataset = EnhancedWildScenesDataset(dataset_type)
         shuffle = dataset_type == 'train'
-        return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=0, pin_memory=True, drop_last=True)
+        return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=0, pin_memory=True, drop_last=True,collate_fn=custom_collate)
 
-# if __name__ == '__main__':
-#     # 测试data_loader
-#     train_loader = get_data_loader('train', batch_size=4)
-#     for images, labels in train_loader:
-#         print(f"Batch image shape: {images.shape}") # 一個批次的圖像數據形狀，一個批次4個圖象，每個圖象3通道，每個圖像尺寸256*341
-#         print(f"Batch label shape: {labels.shape}") # 一個批次的label數據形狀，單通道，表示的是trainId標注的
-#         print(f"Batch label unique values: {torch.unique(labels)}")
-#         break
+if __name__ == '__main__':
+    # 测试data_loader
+    train_loader = get_data_loader('train', batch_size=4)
+    for images, labels in train_loader:
+        print(f"Batch image shape: {images.shape}") # 一個批次的圖像數據形狀，一個批次4個圖象，每個圖象3通道，每個圖像尺寸256*341
+        print(f"Batch label shape: {labels.shape}") # 一個批次的label數據形狀，單通道，表示的是trainId標注的
+        print(f"Batch label unique values: {torch.unique(labels)}")
+        break
 
-#     dataset = EnhancedWildScenesDataset('train')
-#     image, label = dataset[0]
-#     color_coded_label = dataset.get_color_coded_label(label.numpy())
-#     print(f"Color-coded label shape: {color_coded_label.shape}") # 使用顔色編碼的label圖像形狀，發現是3通道，成了！
+    dataset = EnhancedWildScenesDataset('train')
+    image, label = dataset[0]
+    color_coded_label = dataset.get_color_coded_label(label.numpy())
+    print(f"Color-coded label shape: {color_coded_label.shape}") # 使用顔色編碼的label圖像形狀，發現是3通道，成了！
     

@@ -112,6 +112,69 @@
 
 ​	e. 最終分類層，使用1*1的捲積將特徵映射到所需的類別數量num_classes，這樣可以生成更精細的分		割結果
 
+### Mask2former Swin L
+
+對於模型本身，使用了预训练的 Mask2Former 模型（基于 Swin Transformer 的 COCO 全景分割版本），为模型提供了强大的特征提取能力和对复杂场景的理解能力。
+
+backbone:
+
+冻结了大部分预训练参数，这有助于保留预训练模型学到的通用特征。只解冻最后 5 层，允许这些层适应新的任务。
+
+```python
+# 冻结大部分参数
+for param in self.mask2former.parameters():
+    param.requires_grad = False
+# 解冻最后几层
+trainable_layers = list(self.mask2former.named_children())[-5:]
+for name, layer in trainable_layers:
+    for param in layer.parameters():
+    	param.requires_grad = True
+```
+
+輸出層的適應：修改了`class_predictor`以匹配新的类别数
+
+添加了一个额外的 3*3 捲積層：将 100 个查询通道转换为所需的类别数
+
+前向传播过程：利用预训练模型生成初步的掩码查询，通过额外的卷积层处理这些查询，生成最终的类别预测。
+
+```python
+def forward(self, pixel_values):
+    outputs = self.mask2former(pixel_values=pixel_values)
+    masks = outputs.masks_queries_logits  # Shape: [batch_size, 100, height, width]
+    masks = self.extra_conv(masks)  # Shape: [batch_size, num_classes, height, width]
+    return masks
+```
+
+- Method collection 1:
+
+  - 使用CombinedLoss，結合了Focal Loss(1)和Dice Loss(0.5)
+
+  - 只优化需要梯度的参数 (`requires_grad=True`)，初始学习率设为5e-5，权重衰减(L2正则化)设为0.01,有助于防止过拟合
+
+    *AdamW是Adam优化器的一个变体,它对权重衰减的处理更加合理,通常能获得更好的泛化性能。*
+
+  - 学习率调度器，使用ReduceLROnPlateau调度器，监控验证损失('min'模式)，当验证损失在5个epoch内没有改善时,将学习率降低到原来的10%，有助于在训练后期微调模型,突破性能瓶颈
+  - 數據增强：默認設置，與data_load部分的增强策略一致
+
+- Method collection 2:
+  - 數據增强，train階段新增了随机颜色抖动 (亮度、对比度、饱和度)，有些圖像光照强烈，随机颜色抖动可以增强模型對不同光照條件的適應能力，同時減少對特定顔色特徵的過度依賴，有助於模型關注物體的形狀和紋理特徵，not just color；随机裁剪，改善模型对局部特征的理解，迫使模型学习识别物体的局部特征，而不仅仅依赖于完整的物体形状
+  - 使用 CosineAnnealingLR 学习率调度器，更平滑地使学习率下降，在Method collection 1中，學習率下降階段速度過快，在epoch 30就降低為0
+  - 降低了梯度裁剪的阈值，稳定训练
+  - 優化器設置，将优化器的 weight_decay 降低，lr=1e-4，减少正则化强度
+  - 使用CombinedLoss，結合了Focal Loss(0.75)和Dice Loss(0.25)，减少对难分类样本的过度关注，稍微降低 Focal Loss的权重（1.0 →0.75）以防止模型过度关注极难分类的样本，可能是噪声或异常值；Focal Loss 有时可能导致训练不稳定，希望通過略微降低其权重來缓解这个问题。
+  - Dice loss（0.5 → 0.25），由於Dice loss通常對大區域敏感，所以相对减少 Dice Loss 的影响有助于模型更好地处理小目标和精细结构，更多地关注像素级别的准确性
+  - 降低損失函數整體的權重來降低总体损失值，Method collection 1中使用的是基于损失值的调度器`ReduceLROnPlateau`
+ 
+<!-- ### 接下來要做的事情
+
+在原有基礎上，添加Unet 和 FCN resnet 50 的敘述。
+
+爲什麽在miou之外，我們要選擇了'pixel_acc': val_pixel_acc, 'dice': val_dice
+
+###  -->
+
+
+### 任務規範和數據集理解
 
 
 

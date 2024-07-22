@@ -1,36 +1,23 @@
+# 調整 從epoch 30學習率就降低為0了，收斂過快，後期loss浮動沒有明顯下降，mIOU 像素精準度 Dice相關係數也沒有明顯上升
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR, CosineAnnealingWarmRestarts
 from torch.cuda.amp import GradScaler, autocast
+from transformers import Mask2FormerForUniversalSegmentation
+from data_load_for_mask2former import EnhancedWildScenesDataset
 from tqdm import tqdm
 import numpy as np
 import os
 import logging
-from data_load import EnhancedWildScenesDataset
-from models.unet import UNet
 from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calculate_dice_coefficient
 from utils.losses import CombinedLoss
 from utils.log import setup_logger, save_checkpoint
 import torch.nn.functional as F
+import math
+from models.custom_mask2former import CustomMask2Former
 import wandb  # 导入wandb
 
-def setup_logger(log_file):
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s',
-                        handlers=[
-                            logging.FileHandler(log_file),
-                            logging.StreamHandler()
-                        ])
-
-def save_checkpoint(model, optimizer, epoch, metrics, path):
-    state = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'metrics': metrics
-    }
-    torch.save(state, path)
 
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
     model.train()
@@ -45,13 +32,20 @@ def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_
 
         optimizer.zero_grad()
 
-        with autocast():
+        with torch.cuda.amp.autocast():
             outputs = model(images)
+
             if outputs.shape[-2:] != labels.shape[-2:]:
-                outputs = F.interpolate(outputs, size=labels.shape[-2:], mode='bilinear', align_corners=False)
+                outputs = F.interpolate(outputs, size=labels.shape[-2:],
+                                        mode='bilinear', align_corners=False)
+
             loss = criterion(outputs, labels)
 
         scaler.scale(loss).backward()
+
+        # 调整梯度裁剪的 max_norm 值為0.5
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=0.5)
+
         scaler.step(optimizer)
         scaler.update()
 
@@ -72,6 +66,7 @@ def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_
             total_pixel_acc / num_batches if num_batches > 0 else 0.0,
             total_dice / num_batches if num_batches > 0 else 0.0)
 
+
 def validate_epoch(model, dataloader, criterion, device, num_classes):
     model.eval()
     total_loss = 0
@@ -83,8 +78,11 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
         for images, labels in tqdm(dataloader, desc="Validating"):
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
+
             if outputs.shape[-2:] != labels.shape[-2:]:
-                outputs = F.interpolate(outputs, size=labels.shape[-2:], mode='bilinear', align_corners=False)
+                outputs = F.interpolate(outputs, size=labels.shape[-2:],
+                                        mode='bilinear', align_corners=False)
+
             loss = criterion(outputs, labels)
 
             total_loss += loss.item()
@@ -103,42 +101,45 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
             total_pixel_acc / num_batches,
             total_dice / num_batches)
 
-def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir):
-    # 初始化wandb
+
+def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir, num_classes):
     wandb.init(
-        project="wildscenes-segmentation-unet",  # 设置您的项目名称
+        project="wildscenes-segmentation-mask2former_swin-L",
         config={
-            "model": "UNet",
+            "model": "Mask2Former_Swin-L",
             "learning_rate": optimizer.param_groups[0]['lr'],
             "epochs": num_epochs,
             "batch_size": train_loader.batch_size,
             "num_classes": num_classes,
-            "scheduler": "ReduceLROnPlateau",
+            "scheduler": "CosineAnnealingWarmRestarts",
             "loss": "CombinedLoss",
         }
     )
     
-    best_loss = float('inf')
     best_miou = 0
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
     scaler = GradScaler()
 
     for epoch in range(num_epochs):
-        logging.info(f"Epoch {epoch + 1}/{num_epochs}")
+        current_epoch = epoch + 1
+        logging.info(f"Epoch {current_epoch}/{num_epochs}")
 
-        train_loss, train_miou, train_pixel_acc, train_dice = train_epoch(model, train_loader, criterion, optimizer, scheduler, device, num_classes, scaler)
-        logging.info(f"Epoch {epoch + 1} - Train Loss: {train_loss:.4f}, Train mIoU: {train_miou:.4f}, "
+        train_loss, train_miou, train_pixel_acc, train_dice = train_epoch(
+            model, train_loader, criterion, optimizer, scheduler, device, num_classes, scaler)
+        logging.info(f"Epoch {current_epoch} - Train Loss: {train_loss:.4f}, Train mIoU: {train_miou:.4f}, "
                      f"Train Pixel Acc: {train_pixel_acc:.4f}, Train Dice: {train_dice:.4f}")
 
-        val_loss, val_miou, val_pixel_acc, val_dice = validate_epoch(model, val_loader, criterion, device, num_classes)
-        logging.info(f"Epoch {epoch + 1} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}, "
+        val_loss, val_miou, val_pixel_acc, val_dice = validate_epoch(
+            model, val_loader, criterion, device, num_classes)
+        logging.info(f"Epoch {current_epoch} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}, "
                      f"Val Pixel Acc: {val_pixel_acc:.4f}, Val Dice: {val_dice:.4f}")
 
-        scheduler.step(val_loss)
+        scheduler.step()  # 每个 epoch 结束后调用 scheduler
 
-
-        # 记录指标到wandb
         wandb.log({
-            "epoch": epoch + 1,
+            "epoch": current_epoch,
             "train_loss": train_loss,
             "train_miou": train_miou,
             "train_pixel_acc": train_pixel_acc,
@@ -151,32 +152,26 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         })
 
         metrics = {
-            'val_loss': val_loss,
-            'val_miou': val_miou,
-            'val_pixel_acc': val_pixel_acc,
-            'val_dice': val_dice
+            'miou': val_miou,
+            'pixel_acc': val_pixel_acc,
+            'dice': val_dice
         }
 
         if val_miou > best_miou:
             best_miou = val_miou
-            best_model_path = os.path.join(save_dir, f'best_model_epoch_{epoch + 1}.pth')
-            save_checkpoint(model, optimizer, epoch + 1, metrics, best_model_path)
-            logging.info(f"Epoch {epoch + 1} - Best model saved with Val mIoU: {best_miou:.4f}")
-
-        # if (epoch + 1) % 5 == 0:
-        #     checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch_{epoch + 1}.pth')
-        #     save_checkpoint(model, optimizer, epoch + 1, metrics, checkpoint_path)
-        #     logging.info(f"Epoch {epoch + 1} - Checkpoint saved")
+            best_model_path = os.path.join(save_dir, f'best_model_epoch_{current_epoch}.pth')
+            save_checkpoint(model, optimizer, current_epoch, metrics, best_model_path)
+            logging.info(f"Epoch {current_epoch} - Best model saved with mIoU: {best_miou:.4f}")
 
         current_lr = optimizer.param_groups[0]['lr']
         logging.info(f"Current learning rate: {current_lr:.6f}")
 
     logging.info(f"Training completed after {num_epochs} epochs.")
-    wandb.finish()  # 结束wandb运行
+    wandb.finish()
     return best_model_path
 
 if __name__ == "__main__":
-    save_dir = 'model_checkpoints/Unet'
+    save_dir = os.path.join('model_checkpoints', 'Mask2Former_Swin-L')
     os.makedirs(save_dir, exist_ok=True)
 
     log_file = os.path.join(save_dir, 'training.log')
@@ -190,14 +185,17 @@ if __name__ == "__main__":
 
     num_classes = 17
 
-    model = UNet(3, num_classes).to(device)
+    model = CustomMask2Former(num_classes=num_classes).to(device)
 
-    criterion = CombinedLoss(weight_focal=1.0, weight_dice=0.5)
+    criterion = CombinedLoss(weight_focal=0.75, weight_dice=0.25)
 
-    optimizer = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-5, weight_decay=0.01)
-
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
-
+    optimizer = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-4, weight_decay=0.01)
+    
     num_epochs = 60
-    best_model_path = train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir)
-    logging.info(f"Training completed! Best model saved at {best_model_path}")
+    
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2, eta_min=1e-6)
+
+    best_model_path = train(model, train_loader, val_loader, criterion, optimizer, scheduler,
+                            num_epochs, device, save_dir, num_classes)
+
+    logging.info("Training and prediction completed!")

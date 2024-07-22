@@ -10,12 +10,10 @@ import logging
 from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calculate_dice_coefficient
 from utils.losses import CombinedLoss
 from models.custom_deeplabv3 import CustomDeepLabV3
-from models.custom_unet import DoubleConv, UNet
-from models.custom_mask2former import CustomMask2Former
-from PIL import Image
-import torch.nn as nn
 import torch.nn.functional as F
-from utils.log import setup_logger, save_checkpoint
+import wandb  # 导入wandb
+
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
@@ -105,7 +103,43 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
             total_dice / num_batches)
 
 
+def save_checkpoint(model, optimizer, epoch, metrics, filename):
+    # 保存检查点
+    state = {
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'epoch': epoch,
+        'metrics': metrics
+    }
+    torch.save(state, filename)
+
+
+def setup_logger(log_file):
+    # 设置日志记录器
+    logging.basicConfig(filename=log_file, level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+
+
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir, num_classes):
+    # 初始化wandb
+    wandb.init(
+        project="wildscenes-segmentation-deeplabv3_resnet101",  # 设置您的项目名称
+        config={
+            "model": "CustomDeepLabV3",
+            "learning_rate": optimizer.param_groups[0]['lr'],
+            "epochs": num_epochs,
+            "batch_size": train_loader.batch_size,
+            "num_classes": num_classes,
+            "scheduler": "OneCycleLR",
+            "loss": "CombinedLoss",
+        }
+    )
+    
     # 训练模型的主函数
     best_miou = 0
     if not os.path.exists(save_dir):
@@ -127,6 +161,22 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         logging.info(f"Epoch {current_epoch} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}, "
                      f"Val Pixel Acc: {val_pixel_acc:.4f}, Val Dice: {val_dice:.4f}")
 
+
+
+        # 记录指标到wandb
+        wandb.log({
+            "epoch": current_epoch,
+            "train_loss": train_loss,
+            "train_miou": train_miou,
+            "train_pixel_acc": train_pixel_acc,
+            "train_dice": train_dice,
+            "val_loss": val_loss,
+            "val_miou": val_miou,
+            "val_pixel_acc": val_pixel_acc,
+            "val_dice": val_dice,
+            "learning_rate": optimizer.param_groups[0]['lr']
+        })
+
         metrics = {
             'miou': val_miou,
             'pixel_acc': val_pixel_acc,
@@ -139,28 +189,37 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
             save_checkpoint(model, optimizer, current_epoch, metrics, best_model_path)
             logging.info(f"Epoch {current_epoch} - Best model saved with mIoU: {best_miou:.4f}")
 
-        if current_epoch % 5 == 0:
-            checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch_{current_epoch}.pth')
-            save_checkpoint(model, optimizer, current_epoch, metrics, checkpoint_path)
-            logging.info(f"Epoch {current_epoch} - Checkpoint saved")
+        # if current_epoch % 5 == 0:
+        #     checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch_{current_epoch}.pth')
+        #     save_checkpoint(model, optimizer, current_epoch, metrics, checkpoint_path)
+        #     logging.info(f"Epoch {current_epoch} - Checkpoint saved")
 
         current_lr = optimizer.param_groups[0]['lr']
         logging.info(f"Current learning rate: {current_lr:.6f}")
 
     logging.info(f"Training completed after {num_epochs} epochs.")
+    wandb.finish()  # 结束wandb运行
     return best_model_path
 
 
 if __name__ == "__main__":
-    setup_logger('training.log')
+    # 创建保存目录
+    save_dir = os.path.join('model_checkpoints', 'DeepLabV3 ResNet 101')
+    os.makedirs(save_dir, exist_ok=True)
+
+    # 设置日志文件路径
+    log_file = os.path.join(save_dir, 'training.log')
+    setup_logger(log_file)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logging.info(f"Using device: {device}")
 
-    train_loader = EnhancedWildScenesDataset.get_data_loader('train', batch_size=8)
-    val_loader = EnhancedWildScenesDataset.get_data_loader('valid', batch_size=8)
+    train_loader = EnhancedWildScenesDataset.get_data_loader('train', batch_size=16)
+    val_loader = EnhancedWildScenesDataset.get_data_loader('valid', batch_size=16)
 
-    num_classes = 18  # 根据您的数据集调整这个值
+    # test_loader = EnhancedWildScenesDataset.get_data_loader('test', batch_size=8)
+
+    num_classes = 17
 
     # 选择模型
     model = CustomDeepLabV3(num_classes=num_classes).to(device)
@@ -186,7 +245,6 @@ if __name__ == "__main__":
         final_div_factor=1000
     )
 
-    save_dir = 'model_checkpoints'
     best_model_path = train(model, train_loader, val_loader, criterion, optimizer, scheduler,
                             num_epochs, device, save_dir, num_classes)
 

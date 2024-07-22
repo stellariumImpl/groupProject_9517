@@ -1,61 +1,49 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 from torch.cuda.amp import GradScaler, autocast
+from data_load_for_mask2former import EnhancedWildScenesDataset
 from tqdm import tqdm
 import numpy as np
 import os
 import logging
-from data_load import EnhancedWildScenesDataset
-from models.unet import UNet
 from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calculate_dice_coefficient
 from utils.losses import CombinedLoss
 from utils.log import setup_logger, save_checkpoint
 import torch.nn.functional as F
+from torchvision import models
+from torchvision.models.segmentation import FCN_ResNet50_Weights  # 确保正确导入
 import wandb  # 导入wandb
 
-def setup_logger(log_file):
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s',
-                        handlers=[
-                            logging.FileHandler(log_file),
-                            logging.StreamHandler()
-                        ])
-
-def save_checkpoint(model, optimizer, epoch, metrics, path):
-    state = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'metrics': metrics
-    }
-    torch.save(state, path)
-
-def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
+def train_epoch(model, dataloader, criterion, optimizer, device, num_classes, scaler, accumulation_steps=2):
     model.train()
     total_loss = 0
     total_miou = 0
     total_pixel_acc = 0
     total_dice = 0
     num_batches = 0
+    optimizer.zero_grad()
 
-    for images, labels in tqdm(dataloader, desc="Training"):
+    for i, (images, labels) in enumerate(tqdm(dataloader, desc="Training")):
         images, labels = images.to(device), labels.to(device)
 
-        optimizer.zero_grad()
-
-        with autocast():
-            outputs = model(images)
-            if outputs.shape[-2:] != labels.shape[-2:]:
-                outputs = F.interpolate(outputs, size=labels.shape[-2:], mode='bilinear', align_corners=False)
+        with torch.cuda.amp.autocast():
+            outputs = model(images)['out']
+            outputs = F.interpolate(outputs, size=labels.shape[-2:], mode='bilinear', align_corners=False)
             loss = criterion(outputs, labels)
+            loss = loss / accumulation_steps
 
         scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
 
-        total_loss += loss.item()
+        if (i + 1) % accumulation_steps == 0:
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            scaler.step(optimizer)
+            scaler.update()
+            optimizer.zero_grad()
+
+        total_loss += loss.item() * accumulation_steps
         pred = torch.argmax(outputs, dim=1)
         miou = calculate_miou_train(pred.cpu().numpy(), labels.cpu().numpy(), num_classes)
         pixel_acc = calculate_pixel_accuracy(pred.cpu().numpy(), labels.cpu().numpy())
@@ -66,6 +54,13 @@ def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_
             total_pixel_acc += pixel_acc
             total_dice += dice
             num_batches += 1
+
+    if (i + 1) % accumulation_steps != 0:
+        scaler.unscale_(optimizer)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        scaler.step(optimizer)
+        scaler.update()
+        optimizer.zero_grad()
 
     return (total_loss / len(dataloader),
             total_miou / num_batches if num_batches > 0 else 0.0,
@@ -82,9 +77,8 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
     with torch.no_grad():
         for images, labels in tqdm(dataloader, desc="Validating"):
             images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
-            if outputs.shape[-2:] != labels.shape[-2:]:
-                outputs = F.interpolate(outputs, size=labels.shape[-2:], mode='bilinear', align_corners=False)
+            outputs = model(images)['out']
+            outputs = F.interpolate(outputs, size=labels.shape[-2:], mode='bilinear', align_corners=False)
             loss = criterion(outputs, labels)
 
             total_loss += loss.item()
@@ -103,42 +97,47 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
             total_pixel_acc / num_batches,
             total_dice / num_batches)
 
-def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir):
+def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir, num_classes):
     # 初始化wandb
     wandb.init(
-        project="wildscenes-segmentation-unet",  # 设置您的项目名称
+        project="wildscenes-segmentation-fcn_resnet50",  # 设置您的项目名称
         config={
-            "model": "UNet",
+            "model": "FCN-ResNet50",
             "learning_rate": optimizer.param_groups[0]['lr'],
             "epochs": num_epochs,
             "batch_size": train_loader.batch_size,
             "num_classes": num_classes,
-            "scheduler": "ReduceLROnPlateau",
+            "scheduler": "CosineAnnealingWarmRestarts",
             "loss": "CombinedLoss",
         }
     )
     
-    best_loss = float('inf')
     best_miou = 0
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
     scaler = GradScaler()
 
     for epoch in range(num_epochs):
-        logging.info(f"Epoch {epoch + 1}/{num_epochs}")
+        torch.cuda.empty_cache()
+        current_epoch = epoch + 1
+        logging.info(f"Epoch {current_epoch}/{num_epochs}")
 
-        train_loss, train_miou, train_pixel_acc, train_dice = train_epoch(model, train_loader, criterion, optimizer, scheduler, device, num_classes, scaler)
-        logging.info(f"Epoch {epoch + 1} - Train Loss: {train_loss:.4f}, Train mIoU: {train_miou:.4f}, "
+        train_loss, train_miou, train_pixel_acc, train_dice = train_epoch(
+            model, train_loader, criterion, optimizer, device, num_classes, scaler)
+        logging.info(f"Epoch {current_epoch} - Train Loss: {train_loss:.4f}, Train mIoU: {train_miou:.4f}, "
                      f"Train Pixel Acc: {train_pixel_acc:.4f}, Train Dice: {train_dice:.4f}")
 
-        val_loss, val_miou, val_pixel_acc, val_dice = validate_epoch(model, val_loader, criterion, device, num_classes)
-        logging.info(f"Epoch {epoch + 1} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}, "
+        val_loss, val_miou, val_pixel_acc, val_dice = validate_epoch(
+            model, val_loader, criterion, device, num_classes)
+        logging.info(f"Epoch {current_epoch} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}, "
                      f"Val Pixel Acc: {val_pixel_acc:.4f}, Val Dice: {val_dice:.4f}")
 
-        scheduler.step(val_loss)
+        scheduler.step()
 
-
-        # 记录指标到wandb
+         # 记录指标到wandb
         wandb.log({
-            "epoch": epoch + 1,
+            "epoch": current_epoch,
             "train_loss": train_loss,
             "train_miou": train_miou,
             "train_pixel_acc": train_pixel_acc,
@@ -151,22 +150,21 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         })
 
         metrics = {
-            'val_loss': val_loss,
-            'val_miou': val_miou,
-            'val_pixel_acc': val_pixel_acc,
-            'val_dice': val_dice
+            'miou': val_miou,
+            'pixel_acc': val_pixel_acc,
+            'dice': val_dice
         }
 
         if val_miou > best_miou:
             best_miou = val_miou
-            best_model_path = os.path.join(save_dir, f'best_model_epoch_{epoch + 1}.pth')
-            save_checkpoint(model, optimizer, epoch + 1, metrics, best_model_path)
-            logging.info(f"Epoch {epoch + 1} - Best model saved with Val mIoU: {best_miou:.4f}")
+            best_model_path = os.path.join(save_dir, f'best_model_epoch_{current_epoch}.pth')
+            save_checkpoint(model, optimizer, current_epoch, metrics, best_model_path)
+            logging.info(f"Epoch {current_epoch} - Best model saved with mIoU: {best_miou:.4f}")
 
-        # if (epoch + 1) % 5 == 0:
-        #     checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch_{epoch + 1}.pth')
-        #     save_checkpoint(model, optimizer, epoch + 1, metrics, checkpoint_path)
-        #     logging.info(f"Epoch {epoch + 1} - Checkpoint saved")
+        # if current_epoch % 5 == 0:
+        #     checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch_{current_epoch}.pth')
+        #     save_checkpoint(model, optimizer, current_epoch, metrics, checkpoint_path)
+        #     logging.info(f"Epoch {current_epoch} - Checkpoint saved")
 
         current_lr = optimizer.param_groups[0]['lr']
         logging.info(f"Current learning rate: {current_lr:.6f}")
@@ -176,7 +174,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
     return best_model_path
 
 if __name__ == "__main__":
-    save_dir = 'model_checkpoints/Unet'
+    save_dir = os.path.join('model_checkpoints', 'FCN')
     os.makedirs(save_dir, exist_ok=True)
 
     log_file = os.path.join(save_dir, 'training.log')
@@ -185,19 +183,23 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logging.info(f"Using device: {device}")
 
+    # 修改数据加载器以使用新的增强
     train_loader = EnhancedWildScenesDataset.get_data_loader('train', batch_size=16)
     val_loader = EnhancedWildScenesDataset.get_data_loader('valid', batch_size=16)
 
     num_classes = 17
 
-    model = UNet(3, num_classes).to(device)
+    # 加载预训练的FCN模型
+    model = models.segmentation.fcn_resnet50(weights=FCN_ResNet50_Weights.COCO_WITH_VOC_LABELS_V1)
+    model.classifier[4] = nn.Conv2d(512, num_classes, kernel_size=1)
+    model = model.to(device)
 
-    criterion = CombinedLoss(weight_focal=1.0, weight_dice=0.5)
-
-    optimizer = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-5, weight_decay=0.01)
-
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
-
+    criterion = CombinedLoss(weight_focal=0.75, weight_dice=0.25)
+    optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
     num_epochs = 60
-    best_model_path = train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir)
-    logging.info(f"Training completed! Best model saved at {best_model_path}")
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2, eta_min=1e-6)
+
+    best_model_path = train(model, train_loader, val_loader, criterion, optimizer, scheduler,
+                            num_epochs, device, save_dir, num_classes)
+
+    logging.info("Training and prediction completed!")
