@@ -46,27 +46,21 @@ def calculate_confusion_matrix(pred, target, num_classes):
         minlength=num_classes ** 2).reshape(num_classes, num_classes)
 
 
-def calculate_miou(confusion_matrix):
-    intersection = np.diag(confusion_matrix)
-    ground_truth_set = confusion_matrix.sum(axis=1)
-    predicted_set = confusion_matrix.sum(axis=0)
-    union = ground_truth_set + predicted_set - intersection
-
-    iou = np.zeros_like(intersection, dtype=float)
-    for i in range(len(intersection)):
-        if union[i] != 0:
-            iou[i] = intersection[i] / union[i]
+def calculate_miou(pred, target, num_classes):
+    ious = []
+    pred = pred.ravel()
+    target = target.ravel()
+    for cls in range(num_classes):
+        pred_inds = pred == cls
+        target_inds = target == cls
+        intersection = np.logical_and(pred_inds, target_inds).sum()
+        union = np.logical_or(pred_inds, target_inds).sum()
+        if union == 0:
+            ious.append(float('nan'))  # 如果该类别不存在，则IoU为NaN
         else:
-            iou[i] = 0.0  # 或者设置为 1.0，取决于您如何处理这种情况
-
-    # 移除 NaN 值（如果有的话）
-    valid_iou = iou[~np.isnan(iou)]
-
-    if len(valid_iou) == 0:
-        logging.warning("All IoU values are NaN!")
-        return 0.0
-
-    return np.mean(valid_iou)
+            ious.append(intersection / union)
+    miou = np.nanmean(ious)  # 忽略NaN值计算平均IoU
+    return miou, np.array(ious)
 
 
 def calculate_dice_coefficient(pred, target, num_classes):
