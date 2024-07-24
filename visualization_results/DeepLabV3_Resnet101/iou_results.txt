@@ -1,0 +1,20 @@
+Mean IoU: 0.3154
+
+Class IoUs:
+Class 0 (Dirt): 0.7240
+Class 1 (Bush): 0.1602
+Class 2 (Fence): 0.6591
+Class 3 (Gravel): 0.3196
+Class 4 (Water): 0.0000
+Class 5 (Tree-trunk): 0.3819
+Class 6 (Tree-Foliage): 0.8131
+Class 7 (Other-object): 0.2737
+Class 8 (Other-terrain): 0.0966
+Class 9 (Rock): 0.1611
+Class 10 (Ignore): 0.0000
+Class 11 (Structure): 0.3311
+Class 12 (Mud): 0.1825
+Class 13 (Log): 0.1263
+Class 14 (Grass): 0.6510
+Class 15 (Background): 0.0000
+Class 16 (Sky): 0.4816
