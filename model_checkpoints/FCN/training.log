@@ -1,0 +1,449 @@
+2024-07-21 08:26:13,266 - INFO - Using device: cuda
+2024-07-21 08:35:14,548 - INFO - Epoch 1/60
+2024-07-21 08:44:08,062 - INFO - Using device: cuda
+2024-07-21 08:44:08,989 - INFO - Epoch 1/60
+2024-07-21 09:07:34,886 - INFO - Epoch 1 - Train Loss: 0.5883, Train mIoU: 0.4959, Train Pixel Acc: 0.7364, Train Dice: 0.5360
+2024-07-21 09:14:02,058 - INFO - Epoch 1 - Val Loss: 0.4062, Val mIoU: 0.5176, Val Pixel Acc: 0.7936, Val Dice: 0.5568
+2024-07-21 09:14:02,576 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_1.pth
+2024-07-21 09:14:02,578 - INFO - Epoch 1 - Best model saved with mIoU: 0.5176
+2024-07-21 09:14:02,579 - INFO - Current learning rate: 0.000976
+2024-07-21 09:14:02,626 - INFO - Epoch 2/60
+2024-07-21 09:36:56,924 - INFO - Epoch 2 - Train Loss: 0.4067, Train mIoU: 0.5296, Train Pixel Acc: 0.7898, Train Dice: 0.5722
+2024-07-21 09:43:23,141 - INFO - Epoch 2 - Val Loss: 0.3824, Val mIoU: 0.5342, Val Pixel Acc: 0.8023, Val Dice: 0.5774
+2024-07-21 09:43:23,547 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_2.pth
+2024-07-21 09:43:23,549 - INFO - Epoch 2 - Best model saved with mIoU: 0.5342
+2024-07-21 09:43:23,550 - INFO - Current learning rate: 0.000905
+2024-07-21 09:43:23,602 - INFO - Epoch 3/60
+2024-07-21 10:06:12,239 - INFO - Epoch 3 - Train Loss: 0.3751, Train mIoU: 0.5394, Train Pixel Acc: 0.8031, Train Dice: 0.5877
+2024-07-21 10:12:36,040 - INFO - Epoch 3 - Val Loss: 0.3503, Val mIoU: 0.5526, Val Pixel Acc: 0.8159, Val Dice: 0.6018
+2024-07-21 10:12:36,466 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_3.pth
+2024-07-21 10:12:36,468 - INFO - Epoch 3 - Best model saved with mIoU: 0.5526
+2024-07-21 10:12:36,469 - INFO - Current learning rate: 0.000794
+2024-07-21 10:12:36,521 - INFO - Epoch 4/60
+2024-07-21 10:35:22,400 - INFO - Epoch 4 - Train Loss: 0.3541, Train mIoU: 0.5654, Train Pixel Acc: 0.8103, Train Dice: 0.6181
+2024-07-21 10:41:45,912 - INFO - Epoch 4 - Val Loss: 0.3460, Val mIoU: 0.5661, Val Pixel Acc: 0.8169, Val Dice: 0.6178
+2024-07-21 10:41:46,298 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_4.pth
+2024-07-21 10:41:46,300 - INFO - Epoch 4 - Best model saved with mIoU: 0.5661
+2024-07-21 10:41:46,301 - INFO - Current learning rate: 0.000655
+2024-07-21 10:41:46,350 - INFO - Epoch 5/60
+2024-07-21 11:04:38,741 - INFO - Epoch 5 - Train Loss: 0.3437, Train mIoU: 0.5662, Train Pixel Acc: 0.8148, Train Dice: 0.6208
+2024-07-21 11:11:01,308 - INFO - Epoch 5 - Val Loss: 0.3375, Val mIoU: 0.5599, Val Pixel Acc: 0.8207, Val Dice: 0.6170
+2024-07-21 11:11:01,309 - INFO - Current learning rate: 0.000501
+2024-07-21 11:11:01,361 - INFO - Epoch 6/60
+2024-07-21 11:33:49,165 - INFO - Epoch 6 - Train Loss: 0.3313, Train mIoU: 0.5831, Train Pixel Acc: 0.8197, Train Dice: 0.6405
+2024-07-21 11:40:08,826 - INFO - Epoch 6 - Val Loss: 0.3280, Val mIoU: 0.5764, Val Pixel Acc: 0.8207, Val Dice: 0.6335
+2024-07-21 11:40:09,234 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_6.pth
+2024-07-21 11:40:09,236 - INFO - Epoch 6 - Best model saved with mIoU: 0.5764
+2024-07-21 11:40:09,237 - INFO - Current learning rate: 0.000346
+2024-07-21 11:40:09,289 - INFO - Epoch 7/60
+2024-07-21 12:02:49,774 - INFO - Epoch 7 - Train Loss: 0.3198, Train mIoU: 0.5962, Train Pixel Acc: 0.8237, Train Dice: 0.6578
+2024-07-21 12:09:13,100 - INFO - Epoch 7 - Val Loss: 0.3167, Val mIoU: 0.5868, Val Pixel Acc: 0.8216, Val Dice: 0.6534
+2024-07-21 12:09:13,515 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_7.pth
+2024-07-21 12:09:13,517 - INFO - Epoch 7 - Best model saved with mIoU: 0.5868
+2024-07-21 12:09:13,518 - INFO - Current learning rate: 0.000207
+2024-07-21 12:09:13,569 - INFO - Epoch 8/60
+2024-07-21 12:32:14,831 - INFO - Epoch 8 - Train Loss: 0.2991, Train mIoU: 0.6037, Train Pixel Acc: 0.8274, Train Dice: 0.6692
+2024-07-21 12:38:37,356 - INFO - Epoch 8 - Val Loss: 0.2948, Val mIoU: 0.5896, Val Pixel Acc: 0.8284, Val Dice: 0.6538
+2024-07-21 12:38:37,736 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_8.pth
+2024-07-21 12:38:37,738 - INFO - Epoch 8 - Best model saved with mIoU: 0.5896
+2024-07-21 12:38:37,740 - INFO - Current learning rate: 0.000096
+2024-07-21 12:38:37,788 - INFO - Epoch 9/60
+2024-07-21 13:01:29,795 - INFO - Epoch 9 - Train Loss: 0.2787, Train mIoU: 0.6162, Train Pixel Acc: 0.8312, Train Dice: 0.6823
+2024-07-21 13:07:50,951 - INFO - Epoch 9 - Val Loss: 0.2811, Val mIoU: 0.5975, Val Pixel Acc: 0.8289, Val Dice: 0.6657
+2024-07-21 13:07:51,337 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_9.pth
+2024-07-21 13:07:51,339 - INFO - Epoch 9 - Best model saved with mIoU: 0.5975
+2024-07-21 13:07:51,340 - INFO - Current learning rate: 0.000025
+2024-07-21 13:07:51,392 - INFO - Epoch 10/60
+2024-07-21 13:30:34,122 - INFO - Epoch 10 - Train Loss: 0.2700, Train mIoU: 0.6216, Train Pixel Acc: 0.8331, Train Dice: 0.6895
+2024-07-21 13:36:55,334 - INFO - Epoch 10 - Val Loss: 0.2773, Val mIoU: 0.6031, Val Pixel Acc: 0.8308, Val Dice: 0.6710
+2024-07-21 13:36:55,729 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_10.pth
+2024-07-21 13:36:55,731 - INFO - Epoch 10 - Best model saved with mIoU: 0.6031
+2024-07-21 13:36:55,732 - INFO - Current learning rate: 0.001000
+2024-07-21 13:36:55,783 - INFO - Epoch 11/60
+2024-07-21 13:59:51,092 - INFO - Epoch 11 - Train Loss: 0.3078, Train mIoU: 0.5668, Train Pixel Acc: 0.8068, Train Dice: 0.6294
+2024-07-21 14:06:13,380 - INFO - Epoch 11 - Val Loss: 0.3173, Val mIoU: 0.5452, Val Pixel Acc: 0.7999, Val Dice: 0.6069
+2024-07-21 14:06:13,381 - INFO - Current learning rate: 0.000994
+2024-07-21 14:06:13,432 - INFO - Epoch 12/60
+2024-07-21 14:29:18,892 - INFO - Epoch 12 - Train Loss: 0.2917, Train mIoU: 0.5535, Train Pixel Acc: 0.8077, Train Dice: 0.6164
+2024-07-21 14:35:45,802 - INFO - Epoch 12 - Val Loss: 0.2883, Val mIoU: 0.5484, Val Pixel Acc: 0.8046, Val Dice: 0.6133
+2024-07-21 14:35:45,803 - INFO - Current learning rate: 0.000976
+2024-07-21 14:35:45,853 - INFO - Epoch 13/60
+2024-07-21 14:58:55,515 - INFO - Epoch 13 - Train Loss: 0.2670, Train mIoU: 0.5813, Train Pixel Acc: 0.8137, Train Dice: 0.6483
+2024-07-21 15:05:16,150 - INFO - Epoch 13 - Val Loss: 0.2734, Val mIoU: 0.5708, Val Pixel Acc: 0.8160, Val Dice: 0.6382
+2024-07-21 15:05:16,151 - INFO - Current learning rate: 0.000946
+2024-07-21 15:05:16,203 - INFO - Epoch 14/60
+2024-07-21 15:28:31,018 - INFO - Epoch 14 - Train Loss: 0.2663, Train mIoU: 0.5814, Train Pixel Acc: 0.8142, Train Dice: 0.6477
+2024-07-21 15:35:07,193 - INFO - Epoch 14 - Val Loss: 0.2629, Val mIoU: 0.5763, Val Pixel Acc: 0.8185, Val Dice: 0.6390
+2024-07-21 15:35:07,194 - INFO - Current learning rate: 0.000905
+2024-07-21 15:35:07,245 - INFO - Epoch 15/60
+2024-07-21 15:58:29,631 - INFO - Epoch 15 - Train Loss: 0.2501, Train mIoU: 0.6010, Train Pixel Acc: 0.8220, Train Dice: 0.6667
+2024-07-21 16:04:56,377 - INFO - Epoch 15 - Val Loss: 0.2627, Val mIoU: 0.5851, Val Pixel Acc: 0.8240, Val Dice: 0.6432
+2024-07-21 16:04:56,378 - INFO - Current learning rate: 0.000854
+2024-07-21 16:04:56,430 - INFO - Epoch 16/60
+2024-07-21 16:28:21,540 - INFO - Epoch 16 - Train Loss: 0.2438, Train mIoU: 0.6060, Train Pixel Acc: 0.8261, Train Dice: 0.6731
+2024-07-21 16:34:50,626 - INFO - Epoch 16 - Val Loss: 0.2530, Val mIoU: 0.5767, Val Pixel Acc: 0.8226, Val Dice: 0.6445
+2024-07-21 16:34:50,627 - INFO - Current learning rate: 0.000794
+2024-07-21 16:34:50,679 - INFO - Epoch 17/60
+2024-07-21 16:58:09,313 - INFO - Epoch 17 - Train Loss: 0.2403, Train mIoU: 0.6146, Train Pixel Acc: 0.8277, Train Dice: 0.6829
+2024-07-21 17:04:39,939 - INFO - Epoch 17 - Val Loss: 0.2519, Val mIoU: 0.5927, Val Pixel Acc: 0.8237, Val Dice: 0.6624
+2024-07-21 17:04:39,940 - INFO - Current learning rate: 0.000727
+2024-07-21 17:04:39,992 - INFO - Epoch 18/60
+2024-07-21 17:27:38,001 - INFO - Epoch 18 - Train Loss: 0.2481, Train mIoU: 0.6054, Train Pixel Acc: 0.8224, Train Dice: 0.6742
+2024-07-21 17:34:04,166 - INFO - Epoch 18 - Val Loss: 0.2572, Val mIoU: 0.5791, Val Pixel Acc: 0.8231, Val Dice: 0.6452
+2024-07-21 17:34:04,167 - INFO - Current learning rate: 0.000655
+2024-07-21 17:34:04,219 - INFO - Epoch 19/60
+2024-07-21 17:57:08,810 - INFO - Epoch 19 - Train Loss: 0.2387, Train mIoU: 0.6166, Train Pixel Acc: 0.8293, Train Dice: 0.6858
+2024-07-21 18:03:36,001 - INFO - Epoch 19 - Val Loss: 0.2604, Val mIoU: 0.5873, Val Pixel Acc: 0.8261, Val Dice: 0.6521
+2024-07-21 18:03:36,002 - INFO - Current learning rate: 0.000579
+2024-07-21 18:03:36,054 - INFO - Epoch 20/60
+2024-07-21 18:26:51,445 - INFO - Epoch 20 - Train Loss: 0.2301, Train mIoU: 0.6258, Train Pixel Acc: 0.8319, Train Dice: 0.6954
+2024-07-21 18:33:19,502 - INFO - Epoch 20 - Val Loss: 0.2429, Val mIoU: 0.6084, Val Pixel Acc: 0.8282, Val Dice: 0.6765
+2024-07-21 18:33:19,911 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_20.pth
+2024-07-21 18:33:19,914 - INFO - Epoch 20 - Best model saved with mIoU: 0.6084
+2024-07-21 18:33:19,915 - INFO - Current learning rate: 0.000501
+2024-07-21 18:33:19,966 - INFO - Epoch 21/60
+2024-07-21 18:56:41,670 - INFO - Epoch 21 - Train Loss: 0.2252, Train mIoU: 0.6369, Train Pixel Acc: 0.8341, Train Dice: 0.7067
+2024-07-21 19:03:13,165 - INFO - Epoch 21 - Val Loss: 0.2415, Val mIoU: 0.6076, Val Pixel Acc: 0.8261, Val Dice: 0.6780
+2024-07-21 19:03:13,166 - INFO - Current learning rate: 0.000422
+2024-07-21 19:03:13,218 - INFO - Epoch 22/60
+2024-07-21 19:26:10,283 - INFO - Epoch 22 - Train Loss: 0.2172, Train mIoU: 0.6468, Train Pixel Acc: 0.8369, Train Dice: 0.7181
+2024-07-21 19:32:36,451 - INFO - Epoch 22 - Val Loss: 0.2397, Val mIoU: 0.6227, Val Pixel Acc: 0.8290, Val Dice: 0.6932
+2024-07-21 19:32:36,875 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_22.pth
+2024-07-21 19:32:36,877 - INFO - Epoch 22 - Best model saved with mIoU: 0.6227
+2024-07-21 19:32:36,878 - INFO - Current learning rate: 0.000346
+2024-07-21 19:32:36,930 - INFO - Epoch 23/60
+2024-07-21 19:55:48,250 - INFO - Epoch 23 - Train Loss: 0.2095, Train mIoU: 0.6562, Train Pixel Acc: 0.8382, Train Dice: 0.7258
+2024-07-21 20:02:10,815 - INFO - Epoch 23 - Val Loss: 0.2341, Val mIoU: 0.6259, Val Pixel Acc: 0.8292, Val Dice: 0.6964
+2024-07-21 20:02:11,196 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_23.pth
+2024-07-21 20:02:11,199 - INFO - Epoch 23 - Best model saved with mIoU: 0.6259
+2024-07-21 20:02:11,199 - INFO - Current learning rate: 0.000274
+2024-07-21 20:02:11,251 - INFO - Epoch 24/60
+2024-07-21 20:25:07,511 - INFO - Epoch 24 - Train Loss: 0.2048, Train mIoU: 0.6574, Train Pixel Acc: 0.8411, Train Dice: 0.7278
+2024-07-21 20:31:30,072 - INFO - Epoch 24 - Val Loss: 0.2417, Val mIoU: 0.6148, Val Pixel Acc: 0.8298, Val Dice: 0.6837
+2024-07-21 20:31:30,072 - INFO - Current learning rate: 0.000207
+2024-07-21 20:31:30,123 - INFO - Epoch 25/60
+2024-07-21 20:54:36,432 - INFO - Epoch 25 - Train Loss: 0.2000, Train mIoU: 0.6711, Train Pixel Acc: 0.8430, Train Dice: 0.7421
+2024-07-21 21:00:58,752 - INFO - Epoch 25 - Val Loss: 0.2397, Val mIoU: 0.6229, Val Pixel Acc: 0.8305, Val Dice: 0.6928
+2024-07-21 21:00:58,753 - INFO - Current learning rate: 0.000147
+2024-07-21 21:00:58,801 - INFO - Epoch 26/60
+2024-07-21 21:24:03,858 - INFO - Epoch 26 - Train Loss: 0.1953, Train mIoU: 0.6716, Train Pixel Acc: 0.8455, Train Dice: 0.7427
+2024-07-21 21:30:28,269 - INFO - Epoch 26 - Val Loss: 0.2298, Val mIoU: 0.6331, Val Pixel Acc: 0.8317, Val Dice: 0.7041
+2024-07-21 21:30:28,641 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_26.pth
+2024-07-21 21:30:28,643 - INFO - Epoch 26 - Best model saved with mIoU: 0.6331
+2024-07-21 21:30:28,644 - INFO - Current learning rate: 0.000096
+2024-07-21 21:30:28,696 - INFO - Epoch 27/60
+2024-07-21 21:53:05,753 - INFO - Epoch 27 - Train Loss: 0.1903, Train mIoU: 0.6787, Train Pixel Acc: 0.8470, Train Dice: 0.7503
+2024-07-21 21:59:19,742 - INFO - Epoch 27 - Val Loss: 0.2308, Val mIoU: 0.6316, Val Pixel Acc: 0.8326, Val Dice: 0.7018
+2024-07-21 21:59:19,743 - INFO - Current learning rate: 0.000055
+2024-07-21 21:59:19,795 - INFO - Epoch 28/60
+2024-07-21 22:21:44,571 - INFO - Epoch 28 - Train Loss: 0.1870, Train mIoU: 0.6813, Train Pixel Acc: 0.8487, Train Dice: 0.7532
+2024-07-21 22:28:03,098 - INFO - Epoch 28 - Val Loss: 0.2301, Val mIoU: 0.6365, Val Pixel Acc: 0.8321, Val Dice: 0.7090
+2024-07-21 22:28:03,504 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_28.pth
+2024-07-21 22:28:03,506 - INFO - Epoch 28 - Best model saved with mIoU: 0.6365
+2024-07-21 22:28:03,507 - INFO - Current learning rate: 0.000025
+2024-07-21 22:28:03,559 - INFO - Epoch 29/60
+2024-07-21 22:50:42,935 - INFO - Epoch 29 - Train Loss: 0.1856, Train mIoU: 0.6866, Train Pixel Acc: 0.8493, Train Dice: 0.7585
+2024-07-21 22:56:58,448 - INFO - Epoch 29 - Val Loss: 0.2309, Val mIoU: 0.6330, Val Pixel Acc: 0.8328, Val Dice: 0.7039
+2024-07-21 22:56:58,449 - INFO - Current learning rate: 0.000007
+2024-07-21 22:56:58,501 - INFO - Epoch 30/60
+2024-07-21 23:19:24,335 - INFO - Epoch 30 - Train Loss: 0.1842, Train mIoU: 0.6866, Train Pixel Acc: 0.8493, Train Dice: 0.7588
+2024-07-21 23:25:38,017 - INFO - Epoch 30 - Val Loss: 0.2313, Val mIoU: 0.6338, Val Pixel Acc: 0.8327, Val Dice: 0.7053
+2024-07-21 23:25:38,018 - INFO - Current learning rate: 0.001000
+2024-07-21 23:25:38,070 - INFO - Epoch 31/60
+2024-07-21 23:48:04,709 - INFO - Epoch 31 - Train Loss: 0.2469, Train mIoU: 0.6134, Train Pixel Acc: 0.8221, Train Dice: 0.6813
+2024-07-21 23:54:25,178 - INFO - Epoch 31 - Val Loss: 0.2709, Val mIoU: 0.5817, Val Pixel Acc: 0.8098, Val Dice: 0.6501
+2024-07-21 23:54:25,179 - INFO - Current learning rate: 0.000998
+2024-07-21 23:54:25,230 - INFO - Epoch 32/60
+2024-07-22 01:29:26,360 - INFO - Using device: cuda
+2024-07-22 01:29:31,329 - INFO - Epoch 1/60
+2024-07-22 01:53:27,817 - INFO - Epoch 1 - Train Loss: 0.5717, Train mIoU: 0.5002, Train Pixel Acc: 0.7388, Train Dice: 0.5406
+2024-07-22 02:00:03,789 - INFO - Epoch 1 - Val Loss: 0.4122, Val mIoU: 0.5255, Val Pixel Acc: 0.7975, Val Dice: 0.5632
+2024-07-22 02:00:04,395 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_1.pth
+2024-07-22 02:00:04,396 - INFO - Epoch 1 - Best model saved with mIoU: 0.5255
+2024-07-22 02:00:04,396 - INFO - Current learning rate: 0.000976
+2024-07-22 02:00:04,440 - INFO - Epoch 2/60
+2024-07-22 02:24:36,139 - INFO - Using device: cuda
+2024-07-22 02:24:44,585 - INFO - Epoch 1/60
+2024-07-22 02:36:35,560 - INFO - Using device: cuda
+2024-07-22 02:36:43,932 - INFO - Epoch 1/60
+2024-07-22 03:00:12,138 - INFO - Epoch 1 - Train Loss: 0.5834, Train mIoU: 0.4980, Train Pixel Acc: 0.7324, Train Dice: 0.5377
+2024-07-22 03:06:40,255 - INFO - Epoch 1 - Val Loss: 0.4077, Val mIoU: 0.5297, Val Pixel Acc: 0.7935, Val Dice: 0.5712
+2024-07-22 03:06:40,814 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_1.pth
+2024-07-22 03:06:40,815 - INFO - Epoch 1 - Best model saved with mIoU: 0.5297
+2024-07-22 03:06:40,815 - INFO - Current learning rate: 0.000976
+2024-07-22 03:06:40,858 - INFO - Epoch 2/60
+2024-07-22 03:29:45,590 - INFO - Epoch 2 - Train Loss: 0.4047, Train mIoU: 0.5313, Train Pixel Acc: 0.7907, Train Dice: 0.5732
+2024-07-22 03:36:05,478 - INFO - Epoch 2 - Val Loss: 0.3689, Val mIoU: 0.5439, Val Pixel Acc: 0.8097, Val Dice: 0.5932
+2024-07-22 03:36:05,921 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_2.pth
+2024-07-22 03:36:05,922 - INFO - Epoch 2 - Best model saved with mIoU: 0.5439
+2024-07-22 03:36:05,922 - INFO - Current learning rate: 0.000905
+2024-07-22 03:36:05,972 - INFO - Epoch 3/60
+2024-07-22 03:58:57,386 - INFO - Epoch 3 - Train Loss: 0.3753, Train mIoU: 0.5373, Train Pixel Acc: 0.8026, Train Dice: 0.5850
+2024-07-22 04:05:22,836 - INFO - Epoch 3 - Val Loss: 0.3520, Val mIoU: 0.5548, Val Pixel Acc: 0.8105, Val Dice: 0.6040
+2024-07-22 04:05:23,449 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_3.pth
+2024-07-22 04:05:23,450 - INFO - Epoch 3 - Best model saved with mIoU: 0.5548
+2024-07-22 04:05:23,450 - INFO - Current learning rate: 0.000794
+2024-07-22 04:05:23,502 - INFO - Epoch 4/60
+2024-07-22 04:28:25,550 - INFO - Epoch 4 - Train Loss: 0.3586, Train mIoU: 0.5561, Train Pixel Acc: 0.8098, Train Dice: 0.6086
+2024-07-22 04:34:46,271 - INFO - Epoch 4 - Val Loss: 0.3498, Val mIoU: 0.5557, Val Pixel Acc: 0.8158, Val Dice: 0.6058
+2024-07-22 04:34:46,701 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_4.pth
+2024-07-22 04:34:46,701 - INFO - Epoch 4 - Best model saved with mIoU: 0.5557
+2024-07-22 04:34:46,702 - INFO - Current learning rate: 0.000655
+2024-07-22 04:34:46,752 - INFO - Epoch 5/60
+2024-07-22 04:57:31,644 - INFO - Epoch 5 - Train Loss: 0.3444, Train mIoU: 0.5742, Train Pixel Acc: 0.8156, Train Dice: 0.6285
+2024-07-22 05:03:53,960 - INFO - Epoch 5 - Val Loss: 0.3373, Val mIoU: 0.5660, Val Pixel Acc: 0.8186, Val Dice: 0.6191
+2024-07-22 05:03:54,336 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_5.pth
+2024-07-22 05:03:54,337 - INFO - Epoch 5 - Best model saved with mIoU: 0.5660
+2024-07-22 05:03:54,337 - INFO - Current learning rate: 0.000501
+2024-07-22 05:03:54,387 - INFO - Epoch 6/60
+2024-07-22 05:26:53,294 - INFO - Epoch 6 - Train Loss: 0.3321, Train mIoU: 0.5747, Train Pixel Acc: 0.8189, Train Dice: 0.6299
+2024-07-22 05:33:13,678 - INFO - Epoch 6 - Val Loss: 0.3175, Val mIoU: 0.5763, Val Pixel Acc: 0.8246, Val Dice: 0.6335
+2024-07-22 05:33:14,297 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_6.pth
+2024-07-22 05:33:14,297 - INFO - Epoch 6 - Best model saved with mIoU: 0.5763
+2024-07-22 05:33:14,297 - INFO - Current learning rate: 0.000346
+2024-07-22 05:33:14,349 - INFO - Epoch 7/60
+2024-07-22 05:56:09,558 - INFO - Epoch 7 - Train Loss: 0.3004, Train mIoU: 0.5949, Train Pixel Acc: 0.8239, Train Dice: 0.6545
+2024-07-22 06:02:31,522 - INFO - Epoch 7 - Val Loss: 0.2865, Val mIoU: 0.5622, Val Pixel Acc: 0.8252, Val Dice: 0.6295
+2024-07-22 06:02:31,523 - INFO - Current learning rate: 0.000207
+2024-07-22 06:02:31,573 - INFO - Epoch 8/60
+2024-07-22 06:25:19,262 - INFO - Epoch 8 - Train Loss: 0.2724, Train mIoU: 0.6030, Train Pixel Acc: 0.8279, Train Dice: 0.6691
+2024-07-22 06:31:34,765 - INFO - Epoch 8 - Val Loss: 0.2733, Val mIoU: 0.5873, Val Pixel Acc: 0.8285, Val Dice: 0.6553
+2024-07-22 06:31:35,219 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_8.pth
+2024-07-22 06:31:35,220 - INFO - Epoch 8 - Best model saved with mIoU: 0.5873
+2024-07-22 06:31:35,220 - INFO - Current learning rate: 0.000096
+2024-07-22 06:31:35,267 - INFO - Epoch 9/60
+2024-07-22 06:54:09,280 - INFO - Epoch 9 - Train Loss: 0.2649, Train mIoU: 0.6179, Train Pixel Acc: 0.8307, Train Dice: 0.6851
+2024-07-22 07:00:27,890 - INFO - Epoch 9 - Val Loss: 0.2700, Val mIoU: 0.6014, Val Pixel Acc: 0.8298, Val Dice: 0.6692
+2024-07-22 07:00:28,327 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_9.pth
+2024-07-22 07:00:28,327 - INFO - Epoch 9 - Best model saved with mIoU: 0.6014
+2024-07-22 07:00:28,327 - INFO - Current learning rate: 0.000025
+2024-07-22 07:00:28,378 - INFO - Epoch 10/60
+2024-07-22 07:22:58,833 - INFO - Epoch 10 - Train Loss: 0.2586, Train mIoU: 0.6260, Train Pixel Acc: 0.8338, Train Dice: 0.6936
+2024-07-22 07:29:17,303 - INFO - Epoch 10 - Val Loss: 0.2683, Val mIoU: 0.6018, Val Pixel Acc: 0.8312, Val Dice: 0.6692
+2024-07-22 07:29:17,750 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_10.pth
+2024-07-22 07:29:17,751 - INFO - Epoch 10 - Best model saved with mIoU: 0.6018
+2024-07-22 07:29:17,751 - INFO - Current learning rate: 0.001000
+2024-07-22 07:29:17,801 - INFO - Epoch 11/60
+2024-07-22 07:52:03,843 - INFO - Epoch 11 - Train Loss: 0.3115, Train mIoU: 0.5623, Train Pixel Acc: 0.8012, Train Dice: 0.6218
+2024-07-22 07:58:23,596 - INFO - Epoch 11 - Val Loss: 0.5918, Val mIoU: 0.4944, Val Pixel Acc: 0.6958, Val Dice: 0.5541
+2024-07-22 07:58:23,596 - INFO - Current learning rate: 0.000994
+2024-07-22 07:58:23,646 - INFO - Epoch 12/60
+2024-07-22 08:21:06,041 - INFO - Epoch 12 - Train Loss: 0.2890, Train mIoU: 0.5594, Train Pixel Acc: 0.8067, Train Dice: 0.6203
+2024-07-22 08:27:25,142 - INFO - Epoch 12 - Val Loss: 0.2790, Val mIoU: 0.5576, Val Pixel Acc: 0.8146, Val Dice: 0.6231
+2024-07-22 08:27:25,143 - INFO - Current learning rate: 0.000976
+2024-07-22 08:27:25,193 - INFO - Epoch 13/60
+2024-07-22 08:50:12,203 - INFO - Epoch 13 - Train Loss: 0.2649, Train mIoU: 0.5790, Train Pixel Acc: 0.8174, Train Dice: 0.6442
+2024-07-22 08:56:33,132 - INFO - Epoch 13 - Val Loss: 0.2616, Val mIoU: 0.5742, Val Pixel Acc: 0.8206, Val Dice: 0.6390
+2024-07-22 08:56:33,133 - INFO - Current learning rate: 0.000946
+2024-07-22 08:56:33,180 - INFO - Epoch 14/60
+2024-07-22 09:19:24,828 - INFO - Epoch 14 - Train Loss: 0.2649, Train mIoU: 0.5800, Train Pixel Acc: 0.8172, Train Dice: 0.6469
+2024-07-22 09:25:48,017 - INFO - Epoch 14 - Val Loss: 0.2660, Val mIoU: 0.5931, Val Pixel Acc: 0.8118, Val Dice: 0.6605
+2024-07-22 09:25:48,018 - INFO - Current learning rate: 0.000905
+2024-07-22 09:25:48,068 - INFO - Epoch 15/60
+2024-07-22 09:48:49,997 - INFO - Epoch 15 - Train Loss: 0.2572, Train mIoU: 0.5892, Train Pixel Acc: 0.8185, Train Dice: 0.6543
+2024-07-22 09:55:15,601 - INFO - Epoch 15 - Val Loss: 0.2555, Val mIoU: 0.5822, Val Pixel Acc: 0.8254, Val Dice: 0.6491
+2024-07-22 09:55:15,602 - INFO - Current learning rate: 0.000854
+2024-07-22 09:55:15,652 - INFO - Epoch 16/60
+2024-07-22 10:18:13,518 - INFO - Epoch 16 - Train Loss: 0.2468, Train mIoU: 0.6070, Train Pixel Acc: 0.8250, Train Dice: 0.6746
+2024-07-22 10:24:26,346 - INFO - Epoch 16 - Val Loss: 0.2564, Val mIoU: 0.6011, Val Pixel Acc: 0.8245, Val Dice: 0.6694
+2024-07-22 10:24:26,346 - INFO - Current learning rate: 0.000794
+2024-07-22 10:24:26,394 - INFO - Epoch 17/60
+2024-07-22 10:46:47,645 - INFO - Epoch 17 - Train Loss: 0.2472, Train mIoU: 0.6040, Train Pixel Acc: 0.8255, Train Dice: 0.6692
+2024-07-22 10:52:55,676 - INFO - Epoch 17 - Val Loss: 0.2566, Val mIoU: 0.5753, Val Pixel Acc: 0.8240, Val Dice: 0.6402
+2024-07-22 10:52:55,676 - INFO - Current learning rate: 0.000727
+2024-07-22 10:52:55,726 - INFO - Epoch 18/60
+2024-07-22 11:15:03,551 - INFO - Epoch 18 - Train Loss: 0.2387, Train mIoU: 0.6126, Train Pixel Acc: 0.8282, Train Dice: 0.6817
+2024-07-22 11:21:15,068 - INFO - Epoch 18 - Val Loss: 0.2497, Val mIoU: 0.6089, Val Pixel Acc: 0.8258, Val Dice: 0.6761
+2024-07-22 11:21:15,446 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_18.pth
+2024-07-22 11:21:15,447 - INFO - Epoch 18 - Best model saved with mIoU: 0.6089
+2024-07-22 11:21:15,447 - INFO - Current learning rate: 0.000655
+2024-07-22 11:21:15,497 - INFO - Epoch 19/60
+2024-07-22 11:44:44,294 - INFO - Epoch 19 - Train Loss: 0.2336, Train mIoU: 0.6332, Train Pixel Acc: 0.8306, Train Dice: 0.7023
+2024-07-22 11:51:19,232 - INFO - Epoch 19 - Val Loss: 0.2465, Val mIoU: 0.6006, Val Pixel Acc: 0.8287, Val Dice: 0.6712
+2024-07-22 11:51:19,232 - INFO - Current learning rate: 0.000579
+2024-07-22 11:51:19,282 - INFO - Epoch 20/60
+2024-07-22 12:14:39,610 - INFO - Epoch 20 - Train Loss: 0.2268, Train mIoU: 0.6287, Train Pixel Acc: 0.8339, Train Dice: 0.6993
+2024-07-22 12:20:54,907 - INFO - Epoch 20 - Val Loss: 0.2491, Val mIoU: 0.6086, Val Pixel Acc: 0.8279, Val Dice: 0.6772
+2024-07-22 12:20:54,908 - INFO - Current learning rate: 0.000501
+2024-07-22 12:20:54,958 - INFO - Epoch 21/60
+2024-07-22 12:43:37,302 - INFO - Epoch 21 - Train Loss: 0.2240, Train mIoU: 0.6406, Train Pixel Acc: 0.8345, Train Dice: 0.7105
+2024-07-22 12:49:54,210 - INFO - Epoch 21 - Val Loss: 0.2558, Val mIoU: 0.6006, Val Pixel Acc: 0.8280, Val Dice: 0.6620
+2024-07-22 12:49:54,210 - INFO - Current learning rate: 0.000422
+2024-07-22 12:49:54,262 - INFO - Epoch 22/60
+2024-07-22 13:12:26,882 - INFO - Epoch 22 - Train Loss: 0.2191, Train mIoU: 0.6419, Train Pixel Acc: 0.8349, Train Dice: 0.7099
+2024-07-22 13:18:39,948 - INFO - Epoch 22 - Val Loss: 0.2523, Val mIoU: 0.6005, Val Pixel Acc: 0.8174, Val Dice: 0.6715
+2024-07-22 13:18:39,949 - INFO - Current learning rate: 0.000346
+2024-07-22 13:18:39,999 - INFO - Epoch 23/60
+2024-07-22 13:40:56,407 - INFO - Epoch 23 - Train Loss: 0.2161, Train mIoU: 0.6447, Train Pixel Acc: 0.8366, Train Dice: 0.7140
+2024-07-22 13:47:10,322 - INFO - Epoch 23 - Val Loss: 0.2475, Val mIoU: 0.6072, Val Pixel Acc: 0.8279, Val Dice: 0.6721
+2024-07-22 13:47:10,322 - INFO - Current learning rate: 0.000274
+2024-07-22 13:47:10,372 - INFO - Epoch 24/60
+2024-07-22 14:09:40,155 - INFO - Epoch 24 - Train Loss: 0.2088, Train mIoU: 0.6534, Train Pixel Acc: 0.8393, Train Dice: 0.7235
+2024-07-22 14:16:06,376 - INFO - Epoch 24 - Val Loss: 0.2395, Val mIoU: 0.6198, Val Pixel Acc: 0.8311, Val Dice: 0.6889
+2024-07-22 14:16:06,784 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_24.pth
+2024-07-22 14:16:06,785 - INFO - Epoch 24 - Best model saved with mIoU: 0.6198
+2024-07-22 14:16:06,785 - INFO - Current learning rate: 0.000207
+2024-07-22 14:16:06,835 - INFO - Epoch 25/60
+2024-07-22 14:39:35,017 - INFO - Epoch 25 - Train Loss: 0.2015, Train mIoU: 0.6660, Train Pixel Acc: 0.8426, Train Dice: 0.7361
+2024-07-22 14:46:21,391 - INFO - Epoch 25 - Val Loss: 0.2373, Val mIoU: 0.6258, Val Pixel Acc: 0.8312, Val Dice: 0.6934
+2024-07-22 14:46:21,778 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_25.pth
+2024-07-22 14:46:21,779 - INFO - Epoch 25 - Best model saved with mIoU: 0.6258
+2024-07-22 14:46:21,779 - INFO - Current learning rate: 0.000147
+2024-07-22 14:46:21,829 - INFO - Epoch 26/60
+2024-07-22 15:09:54,005 - INFO - Epoch 26 - Train Loss: 0.1969, Train mIoU: 0.6710, Train Pixel Acc: 0.8454, Train Dice: 0.7419
+2024-07-22 15:16:58,408 - INFO - Epoch 26 - Val Loss: 0.2392, Val mIoU: 0.6249, Val Pixel Acc: 0.8314, Val Dice: 0.6937
+2024-07-22 15:16:58,409 - INFO - Current learning rate: 0.000096
+2024-07-22 15:16:58,458 - INFO - Epoch 27/60
+2024-07-22 15:40:12,900 - INFO - Epoch 27 - Train Loss: 0.1918, Train mIoU: 0.6720, Train Pixel Acc: 0.8475, Train Dice: 0.7431
+2024-07-22 15:46:29,225 - INFO - Epoch 27 - Val Loss: 0.2371, Val mIoU: 0.6288, Val Pixel Acc: 0.8314, Val Dice: 0.7001
+2024-07-22 15:46:29,595 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_27.pth
+2024-07-22 15:46:29,596 - INFO - Epoch 27 - Best model saved with mIoU: 0.6288
+2024-07-22 15:46:29,596 - INFO - Current learning rate: 0.000055
+2024-07-22 15:46:29,646 - INFO - Epoch 28/60
+2024-07-22 16:09:08,783 - INFO - Epoch 28 - Train Loss: 0.1890, Train mIoU: 0.6747, Train Pixel Acc: 0.8495, Train Dice: 0.7466
+2024-07-22 16:15:21,782 - INFO - Epoch 28 - Val Loss: 0.2372, Val mIoU: 0.6311, Val Pixel Acc: 0.8324, Val Dice: 0.7021
+2024-07-22 16:15:22,211 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_28.pth
+2024-07-22 16:15:22,212 - INFO - Epoch 28 - Best model saved with mIoU: 0.6311
+2024-07-22 16:15:22,212 - INFO - Current learning rate: 0.000025
+2024-07-22 16:15:22,262 - INFO - Epoch 29/60
+2024-07-22 16:39:35,361 - INFO - Epoch 29 - Train Loss: 0.1859, Train mIoU: 0.6835, Train Pixel Acc: 0.8497, Train Dice: 0.7549
+2024-07-22 16:46:04,441 - INFO - Epoch 29 - Val Loss: 0.2370, Val mIoU: 0.6328, Val Pixel Acc: 0.8326, Val Dice: 0.7041
+2024-07-22 16:46:04,824 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_29.pth
+2024-07-22 16:46:04,824 - INFO - Epoch 29 - Best model saved with mIoU: 0.6328
+2024-07-22 16:46:04,824 - INFO - Current learning rate: 0.000007
+2024-07-22 16:46:04,875 - INFO - Epoch 30/60
+2024-07-22 17:08:47,818 - INFO - Epoch 30 - Train Loss: 0.1868, Train mIoU: 0.6790, Train Pixel Acc: 0.8499, Train Dice: 0.7496
+2024-07-22 17:15:02,478 - INFO - Epoch 30 - Val Loss: 0.2356, Val mIoU: 0.6340, Val Pixel Acc: 0.8326, Val Dice: 0.7051
+2024-07-22 17:15:02,866 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_30.pth
+2024-07-22 17:15:02,867 - INFO - Epoch 30 - Best model saved with mIoU: 0.6340
+2024-07-22 17:15:02,867 - INFO - Current learning rate: 0.001000
+2024-07-22 17:15:02,914 - INFO - Epoch 31/60
+2024-07-22 17:37:42,212 - INFO - Epoch 31 - Train Loss: 0.2513, Train mIoU: 0.6081, Train Pixel Acc: 0.8195, Train Dice: 0.6739
+2024-07-22 17:43:56,769 - INFO - Epoch 31 - Val Loss: 0.2677, Val mIoU: 0.5842, Val Pixel Acc: 0.8155, Val Dice: 0.6487
+2024-07-22 17:43:56,769 - INFO - Current learning rate: 0.000998
+2024-07-22 17:43:56,817 - INFO - Epoch 32/60
+2024-07-22 18:07:20,346 - INFO - Epoch 32 - Train Loss: 0.2558, Train mIoU: 0.6028, Train Pixel Acc: 0.8162, Train Dice: 0.6695
+2024-07-22 18:13:37,817 - INFO - Epoch 32 - Val Loss: 0.2720, Val mIoU: 0.5844, Val Pixel Acc: 0.8195, Val Dice: 0.6454
+2024-07-22 18:13:37,817 - INFO - Current learning rate: 0.000994
+2024-07-22 18:13:37,865 - INFO - Epoch 33/60
+2024-07-22 18:36:51,575 - INFO - Epoch 33 - Train Loss: 0.2451, Train mIoU: 0.6180, Train Pixel Acc: 0.8212, Train Dice: 0.6855
+2024-07-22 18:43:08,548 - INFO - Epoch 33 - Val Loss: 0.2557, Val mIoU: 0.5911, Val Pixel Acc: 0.8161, Val Dice: 0.6633
+2024-07-22 18:43:08,548 - INFO - Current learning rate: 0.000986
+2024-07-22 18:43:08,598 - INFO - Epoch 34/60
+2024-07-22 19:07:06,186 - INFO - Epoch 34 - Train Loss: 0.2375, Train mIoU: 0.6225, Train Pixel Acc: 0.8239, Train Dice: 0.6913
+2024-07-22 19:13:48,562 - INFO - Epoch 34 - Val Loss: 0.2511, Val mIoU: 0.6000, Val Pixel Acc: 0.8219, Val Dice: 0.6690
+2024-07-22 19:13:48,563 - INFO - Current learning rate: 0.000976
+2024-07-22 19:13:48,613 - INFO - Epoch 35/60
+2024-07-22 19:38:30,146 - INFO - Epoch 35 - Train Loss: 0.2312, Train mIoU: 0.6313, Train Pixel Acc: 0.8258, Train Dice: 0.7009
+2024-07-22 19:45:00,395 - INFO - Epoch 35 - Val Loss: 0.2403, Val mIoU: 0.6072, Val Pixel Acc: 0.8263, Val Dice: 0.6760
+2024-07-22 19:45:00,395 - INFO - Current learning rate: 0.000962
+2024-07-22 19:45:00,446 - INFO - Epoch 36/60
+2024-07-22 20:08:14,299 - INFO - Epoch 36 - Train Loss: 0.2317, Train mIoU: 0.6304, Train Pixel Acc: 0.8277, Train Dice: 0.6997
+2024-07-22 20:14:45,693 - INFO - Epoch 36 - Val Loss: 0.2557, Val mIoU: 0.5906, Val Pixel Acc: 0.8219, Val Dice: 0.6531
+2024-07-22 20:14:45,694 - INFO - Current learning rate: 0.000946
+2024-07-22 20:14:45,741 - INFO - Epoch 37/60
+2024-07-22 20:38:22,015 - INFO - Epoch 37 - Train Loss: 0.2291, Train mIoU: 0.6347, Train Pixel Acc: 0.8276, Train Dice: 0.7038
+2024-07-22 20:44:54,231 - INFO - Epoch 37 - Val Loss: 0.2398, Val mIoU: 0.6158, Val Pixel Acc: 0.8230, Val Dice: 0.6832
+2024-07-22 20:44:54,232 - INFO - Current learning rate: 0.000926
+2024-07-22 20:44:54,281 - INFO - Epoch 38/60
+2024-07-22 21:12:13,374 - INFO - Epoch 38 - Train Loss: 0.2196, Train mIoU: 0.6438, Train Pixel Acc: 0.8318, Train Dice: 0.7139
+2024-07-22 21:20:02,193 - INFO - Epoch 38 - Val Loss: 0.2425, Val mIoU: 0.6130, Val Pixel Acc: 0.8204, Val Dice: 0.6814
+2024-07-22 21:20:02,193 - INFO - Current learning rate: 0.000905
+2024-07-22 21:20:02,243 - INFO - Epoch 39/60
+2024-07-22 21:44:22,916 - INFO - Epoch 39 - Train Loss: 0.2148, Train mIoU: 0.6530, Train Pixel Acc: 0.8333, Train Dice: 0.7221
+2024-07-22 21:51:12,544 - INFO - Epoch 39 - Val Loss: 0.2536, Val mIoU: 0.5973, Val Pixel Acc: 0.8224, Val Dice: 0.6599
+2024-07-22 21:51:12,545 - INFO - Current learning rate: 0.000880
+2024-07-22 21:51:12,592 - INFO - Epoch 40/60
+2024-07-22 22:15:25,297 - INFO - Epoch 40 - Train Loss: 0.2170, Train mIoU: 0.6425, Train Pixel Acc: 0.8338, Train Dice: 0.7119
+2024-07-22 22:22:02,062 - INFO - Epoch 40 - Val Loss: 0.2456, Val mIoU: 0.6160, Val Pixel Acc: 0.8207, Val Dice: 0.6840
+2024-07-22 22:22:02,062 - INFO - Current learning rate: 0.000854
+2024-07-22 22:22:02,110 - INFO - Epoch 41/60
+2024-07-22 22:46:10,540 - INFO - Epoch 41 - Train Loss: 0.2133, Train mIoU: 0.6496, Train Pixel Acc: 0.8356, Train Dice: 0.7202
+2024-07-22 22:52:51,704 - INFO - Epoch 41 - Val Loss: 0.2451, Val mIoU: 0.6173, Val Pixel Acc: 0.8228, Val Dice: 0.6851
+2024-07-22 22:52:51,705 - INFO - Current learning rate: 0.000825
+2024-07-22 22:52:51,753 - INFO - Epoch 42/60
+2024-07-22 23:16:22,672 - INFO - Epoch 42 - Train Loss: 0.2188, Train mIoU: 0.6436, Train Pixel Acc: 0.8326, Train Dice: 0.7143
+2024-07-22 23:22:50,064 - INFO - Epoch 42 - Val Loss: 0.2564, Val mIoU: 0.5990, Val Pixel Acc: 0.8167, Val Dice: 0.6715
+2024-07-22 23:22:50,064 - INFO - Current learning rate: 0.000794
+2024-07-22 23:22:50,118 - INFO - Epoch 43/60
+2024-07-22 23:46:15,685 - INFO - Epoch 43 - Train Loss: 0.2100, Train mIoU: 0.6521, Train Pixel Acc: 0.8358, Train Dice: 0.7256
+2024-07-22 23:52:43,786 - INFO - Epoch 43 - Val Loss: 0.2455, Val mIoU: 0.6143, Val Pixel Acc: 0.8250, Val Dice: 0.6827
+2024-07-22 23:52:43,787 - INFO - Current learning rate: 0.000761
+2024-07-22 23:52:43,837 - INFO - Epoch 44/60
+2024-07-23 00:16:11,379 - INFO - Epoch 44 - Train Loss: 0.2047, Train mIoU: 0.6613, Train Pixel Acc: 0.8372, Train Dice: 0.7337
+2024-07-23 00:22:33,032 - INFO - Epoch 44 - Val Loss: 0.2413, Val mIoU: 0.6231, Val Pixel Acc: 0.8256, Val Dice: 0.6949
+2024-07-23 00:22:33,033 - INFO - Current learning rate: 0.000727
+2024-07-23 00:22:33,083 - INFO - Epoch 45/60
+2024-07-23 00:45:34,275 - INFO - Epoch 45 - Train Loss: 0.2011, Train mIoU: 0.6629, Train Pixel Acc: 0.8405, Train Dice: 0.7362
+2024-07-23 00:52:01,233 - INFO - Epoch 45 - Val Loss: 0.2432, Val mIoU: 0.6241, Val Pixel Acc: 0.8229, Val Dice: 0.6954
+2024-07-23 00:52:01,234 - INFO - Current learning rate: 0.000692
+2024-07-23 00:52:01,284 - INFO - Epoch 46/60
+2024-07-23 01:15:09,188 - INFO - Epoch 46 - Train Loss: 0.2022, Train mIoU: 0.6675, Train Pixel Acc: 0.8393, Train Dice: 0.7409
+2024-07-23 01:21:35,654 - INFO - Epoch 46 - Val Loss: 0.2430, Val mIoU: 0.6159, Val Pixel Acc: 0.8259, Val Dice: 0.6868
+2024-07-23 01:21:35,655 - INFO - Current learning rate: 0.000655
+2024-07-23 01:21:35,702 - INFO - Epoch 47/60
+2024-07-23 01:44:42,074 - INFO - Epoch 47 - Train Loss: 0.1983, Train mIoU: 0.6654, Train Pixel Acc: 0.8426, Train Dice: 0.7386
+2024-07-23 01:51:08,573 - INFO - Epoch 47 - Val Loss: 0.2432, Val mIoU: 0.6198, Val Pixel Acc: 0.8311, Val Dice: 0.6915
+2024-07-23 01:51:08,574 - INFO - Current learning rate: 0.000617
+2024-07-23 01:51:08,624 - INFO - Epoch 48/60
+2024-07-23 02:13:52,834 - INFO - Epoch 48 - Train Loss: 0.1985, Train mIoU: 0.6681, Train Pixel Acc: 0.8428, Train Dice: 0.7407
+2024-07-23 02:20:13,075 - INFO - Epoch 48 - Val Loss: 0.2784, Val mIoU: 0.5936, Val Pixel Acc: 0.8136, Val Dice: 0.6662
+2024-07-23 02:20:13,076 - INFO - Current learning rate: 0.000579
+2024-07-23 02:20:13,126 - INFO - Epoch 49/60
+2024-07-23 02:42:54,241 - INFO - Epoch 49 - Train Loss: 0.1944, Train mIoU: 0.6705, Train Pixel Acc: 0.8440, Train Dice: 0.7432
+2024-07-23 02:49:12,655 - INFO - Epoch 49 - Val Loss: 0.2459, Val mIoU: 0.6245, Val Pixel Acc: 0.8315, Val Dice: 0.6927
+2024-07-23 02:49:12,656 - INFO - Current learning rate: 0.000540
+2024-07-23 02:49:12,706 - INFO - Epoch 50/60
+2024-07-23 03:12:00,378 - INFO - Epoch 50 - Train Loss: 0.1893, Train mIoU: 0.6719, Train Pixel Acc: 0.8468, Train Dice: 0.7439
+2024-07-23 03:18:16,920 - INFO - Epoch 50 - Val Loss: 0.2442, Val mIoU: 0.6352, Val Pixel Acc: 0.8292, Val Dice: 0.7070
+2024-07-23 03:18:17,297 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_50.pth
+2024-07-23 03:18:17,298 - INFO - Epoch 50 - Best model saved with mIoU: 0.6352
+2024-07-23 03:18:17,298 - INFO - Current learning rate: 0.000501
+2024-07-23 03:18:17,348 - INFO - Epoch 51/60
+2024-07-23 03:40:52,251 - INFO - Epoch 51 - Train Loss: 0.1875, Train mIoU: 0.6815, Train Pixel Acc: 0.8463, Train Dice: 0.7537
+2024-07-23 03:47:12,025 - INFO - Epoch 51 - Val Loss: 0.2400, Val mIoU: 0.6279, Val Pixel Acc: 0.8287, Val Dice: 0.6998
+2024-07-23 03:47:12,026 - INFO - Current learning rate: 0.000461
+2024-07-23 03:47:12,076 - INFO - Epoch 52/60
+2024-07-23 04:10:07,533 - INFO - Epoch 52 - Train Loss: 0.1859, Train mIoU: 0.6767, Train Pixel Acc: 0.8486, Train Dice: 0.7500
+2024-07-23 04:16:27,980 - INFO - Epoch 52 - Val Loss: 0.2362, Val mIoU: 0.6281, Val Pixel Acc: 0.8315, Val Dice: 0.7003
+2024-07-23 04:16:27,981 - INFO - Current learning rate: 0.000422
+2024-07-23 04:16:28,031 - INFO - Epoch 53/60
+2024-07-23 04:39:18,091 - INFO - Epoch 53 - Train Loss: 0.1797, Train mIoU: 0.6893, Train Pixel Acc: 0.8503, Train Dice: 0.7638
+2024-07-23 04:45:37,364 - INFO - Epoch 53 - Val Loss: 0.2465, Val mIoU: 0.6317, Val Pixel Acc: 0.8316, Val Dice: 0.7055
+2024-07-23 04:45:37,365 - INFO - Current learning rate: 0.000384
+2024-07-23 04:45:37,412 - INFO - Epoch 54/60
+2024-07-23 05:08:31,676 - INFO - Epoch 54 - Train Loss: 0.1770, Train mIoU: 0.6980, Train Pixel Acc: 0.8517, Train Dice: 0.7710
+2024-07-23 05:14:54,249 - INFO - Epoch 54 - Val Loss: 0.2436, Val mIoU: 0.6344, Val Pixel Acc: 0.8311, Val Dice: 0.7068
+2024-07-23 05:14:54,249 - INFO - Current learning rate: 0.000346
+2024-07-23 05:14:54,296 - INFO - Epoch 55/60
+2024-07-23 05:37:44,451 - INFO - Epoch 55 - Train Loss: 0.1752, Train mIoU: 0.7026, Train Pixel Acc: 0.8524, Train Dice: 0.7757
+2024-07-23 05:44:06,391 - INFO - Epoch 55 - Val Loss: 0.2394, Val mIoU: 0.6312, Val Pixel Acc: 0.8314, Val Dice: 0.7042
+2024-07-23 05:44:06,392 - INFO - Current learning rate: 0.000309
+2024-07-23 05:44:06,442 - INFO - Epoch 56/60
+2024-07-23 06:06:59,708 - INFO - Epoch 56 - Train Loss: 0.1718, Train mIoU: 0.7037, Train Pixel Acc: 0.8539, Train Dice: 0.7776
+2024-07-23 06:13:23,033 - INFO - Epoch 56 - Val Loss: 0.2469, Val mIoU: 0.6365, Val Pixel Acc: 0.8318, Val Dice: 0.7106
+2024-07-23 06:13:23,411 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_56.pth
+2024-07-23 06:13:23,411 - INFO - Epoch 56 - Best model saved with mIoU: 0.6365
+2024-07-23 06:13:23,411 - INFO - Current learning rate: 0.000274
+2024-07-23 06:13:23,461 - INFO - Epoch 57/60
+2024-07-23 06:36:13,979 - INFO - Epoch 57 - Train Loss: 0.1721, Train mIoU: 0.7007, Train Pixel Acc: 0.8542, Train Dice: 0.7736
+2024-07-23 06:42:36,895 - INFO - Epoch 57 - Val Loss: 0.2456, Val mIoU: 0.6406, Val Pixel Acc: 0.8314, Val Dice: 0.7144
+2024-07-23 06:42:37,271 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_57.pth
+2024-07-23 06:42:37,272 - INFO - Epoch 57 - Best model saved with mIoU: 0.6406
+2024-07-23 06:42:37,272 - INFO - Current learning rate: 0.000240
+2024-07-23 06:42:37,322 - INFO - Epoch 58/60
+2024-07-23 07:05:27,100 - INFO - Epoch 58 - Train Loss: 0.1711, Train mIoU: 0.7010, Train Pixel Acc: 0.8548, Train Dice: 0.7746
+2024-07-23 07:11:52,110 - INFO - Epoch 58 - Val Loss: 0.2334, Val mIoU: 0.6425, Val Pixel Acc: 0.8318, Val Dice: 0.7171
+2024-07-23 07:11:52,506 - INFO - Checkpoint saved: model_checkpoints/FCN/best_model_epoch_58.pth
+2024-07-23 07:11:52,507 - INFO - Epoch 58 - Best model saved with mIoU: 0.6425
+2024-07-23 07:11:52,507 - INFO - Current learning rate: 0.000207
+2024-07-23 07:11:52,554 - INFO - Epoch 59/60
+2024-07-23 07:34:55,861 - INFO - Epoch 59 - Train Loss: 0.1671, Train mIoU: 0.7080, Train Pixel Acc: 0.8568, Train Dice: 0.7815
+2024-07-23 07:41:19,617 - INFO - Epoch 59 - Val Loss: 0.2444, Val mIoU: 0.6391, Val Pixel Acc: 0.8316, Val Dice: 0.7131
+2024-07-23 07:41:19,618 - INFO - Current learning rate: 0.000176
+2024-07-23 07:41:19,668 - INFO - Epoch 60/60
+2024-07-23 08:04:12,802 - INFO - Epoch 60 - Train Loss: 0.1672, Train mIoU: 0.7065, Train Pixel Acc: 0.8567, Train Dice: 0.7803
+2024-07-23 08:10:34,106 - INFO - Epoch 60 - Val Loss: 0.2459, Val mIoU: 0.6405, Val Pixel Acc: 0.8320, Val Dice: 0.7138
+2024-07-23 08:10:34,106 - INFO - Current learning rate: 0.000147
+2024-07-23 08:10:34,106 - INFO - Training completed after 60 epochs.
+2024-07-23 08:10:45,890 - INFO - Training and prediction completed!
