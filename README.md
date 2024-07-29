@@ -1,39 +1,32 @@
-### 计划
+### Plan
+- Split the dataset
+- Load data
+- Select models (U-Net, DeepLab, FCN) for training, compare different models; adjust loss functions, choose optimizers, tune hyperparameters, calculate evaluation metrics (IoU, Dice coefficient)
+- Apply test set to evaluate trained model performance, check generalization ability, verify for overfitting; visualize semantic segmentation on test set images; set up model saving and loading mechanisms
+- Optimize dataset splitting, address gaps in the three sets
+- Write paper, collect references
 
-- 划分数据集 
-- 载入数据
-- 选择模型（U-Net、DeepLab、FCN）训练，比较不同模型；調整损失函数,选择优化器，调整超参数，統計评估指标（IoU、Dice coefficient）
-- 应用测试集评估訓練好的模型性能，检查泛化能力，检验是否过拟合；可视化對測試集原圖進行語義分割；设置模型保存和加载机制
-- 实例分割? 全景分割?
+### Issues
+- Color and trainId mapping seemed incorrect, why was the background all black? (Resolved)
+- How to more intuitively record detailed logs during training and validation processes, how to use visualization tools like TensorBoard to observe changes in loss and mIoU? (Resolved)
+- Current data volume is insufficient, only using V-01 image set (Resolved)
 
-### 問題
+### Usage Instructions
+Download the [dataset](https://doi.org/10.25919/5hzc-5p73) yourself and place it adjacent to the project root directory. Currently using V-01, V-02, and V-03.
+All notebook file contents can be run normally to obtain results.
+- data_split_optimizer.ipynb file splits the dataset
+- group_work_deeplabv3_resnet101.ipynb includes training, prediction, and visualization for deeplabv3_resnet101
+- group_work_fcn_resnet50.ipynb includes training, prediction, and visualization for fcn_resnet50
+- group_work_mask2former.ipynb includes training, prediction, and visualization for mask2former
+- group_work_unet.ipynb includes training, prediction, and visualization for unet
 
-- 顔色與trainId閒的映射似乎不對，背景爲什麽是全黑？
-
-- 如何更直觀地记录训练和验证过程中的详细日志，怎麽使用可视化工具，比如 TensorBoard 观察损失和 mIoU 的变化？
-
-- 當前數據量還不夠，只用了V-01的圖片集
-
-### 使用方法
-
-自行下載[數據集](https://doi.org/10.25919/5hzc-5p73)，下載完單后，放在與項目根目錄相鄰的位置。當前使用的是V-01
-
-- `data_split.py` 
-
-- `data_load.py` 
-
-- `train.py` 
-
-- `test.py` 使用前需要執行model_checkpoints目錄下的脚本
-
-### 配置环境
-
+### Environment Configuration
 ```
 conda create -n group_work python=3.9
 conda activate group_work
 conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 pip install -r requirements.txt
-# 然后会出现一些报错 其实无所谓 如果需要解决
+# Some errors may occur, but they're not critical. If you need to resolve them:
 pip uninstall torchaudio -y
 pip show torch torchvision
 # #Name: torch
@@ -57,8 +50,9 @@ pip show torch torchvision
 # Location: e:\languages\anaconda3\envs\image_processing\lib\site-packages
 # Requires: numpy, pillow, torch
 # Required-by:
-# 环境中已经正确安装了与 PyTorch 1.10.1 兼容的 torchvision 0.11.2 版本
-# 安装与 PyTorch 1.10.1 兼容的 torchaudio 版本
+# The environment already has torchvision 0.11.2 correctly installed, compatible with PyTorch 1.10.1
+# Install torchaudio version compatible with PyTorch 1.10.1
 pip install torchaudio==0.10.1 
-# 如果在安装 torchaudio 时遇到任何问题
+# If you encounter any problems installing torchaudio
 conda install torchaudio==0.10.1 -c pytorch
+```
