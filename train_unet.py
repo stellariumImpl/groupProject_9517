@@ -198,6 +198,6 @@ if __name__ == "__main__":
 
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5)
 
-    num_epochs = 60
+    num_epochs = 50
     best_model_path = train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir)
     logging.info(f"Training completed! Best model saved at {best_model_path}")
