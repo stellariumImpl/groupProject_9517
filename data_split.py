@@ -20,8 +20,8 @@ class WildScenesDataset:
     }
     csv = _csv_files
     _label_to_trainid = {
-        0: 15,  # 背景类
-        1: 16,  # 忽略类
+        0: 15,  # Background
+        1: 16,  # Ignore
         2: 0,  # Bush
         3: 1,  # Dirt
         4: 2,  # Fence
@@ -31,13 +31,13 @@ class WildScenesDataset:
         8: 6,  # Mud
         9: 7,  # Other-Object
         10: 8,  # Other-terrain
-        11: 16,  # 忽略类
+        11: 16,  # Ignore
         12: 9,  # Rock
         13: 10,  # Sky
         14: 11,  # Structure
         15: 12,  # Tree-foliage
         16: 13,  # Tree-trunk
-        17: 16,  # 忽略类
+        17: 16,  # Ignore
         18: 14,  # Water
     }
     def __init__(self, dataset_type, transform=None):
@@ -58,10 +58,10 @@ class WildScenesDataset:
 
             image = Image.open(image_path).convert('RGB')
             label = Image.open(label_path).convert('L')
-            # 将灰度图转换为Numpy数组
+            # Convert grayscale image to Numpy array
             label_np = np.array(label)
 
-            # 将标签索引映射到训练标识（trainId）值
+            # Map tag index to training identifier (trainId) value
             label_trainId = np.vectorize(lambda x: self._label_to_trainid.get(x, 255))(label_np)
 
             if self._transform is not None:
@@ -162,7 +162,7 @@ class WildScenesDataset:
         df_valid[['image', 'label']].to_csv(os.path.join(WildScenesDataset.csv['valid']), index=False)
         df_test[['image', 'label']].to_csv(os.path.join(WildScenesDataset.csv['test']), index=False)
 
-    # 测试語義分割時用
+    # When testing semantic segmentation, use
     @staticmethod
     def test_label_mapping(label_path):
         """
