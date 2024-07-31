@@ -74,51 +74,51 @@ class AdvancedAugmentation:
         self.p = p
 
     def __call__(self, image, mask):
-        # 确保输入是 PIL 图像
+         # Make sure the input is a PIL image
         if not isinstance(image, Image.Image):
             image = Image.fromarray(np.uint8(image))
         if not isinstance(mask, Image.Image):
             mask = Image.fromarray(np.uint8(mask))
 
-        # 调整大小
+        # adjust size
         image = TF.resize(image, self.size, interpolation=TF.InterpolationMode.BILINEAR)
         mask = TF.resize(mask, self.size, interpolation=TF.InterpolationMode.NEAREST)
 
         if random.random() < self.p:
-            # 随机水平翻转
+            # random flipping
             if random.random() < 0.5:
                 image = TF.hflip(image)
                 mask = TF.hflip(mask)
             
-            # 随机垂直翻转
+            # random vertical flip
             if random.random() < 0.5:
                 image = TF.vflip(image)
                 mask = TF.vflip(mask)
             
-            # 随机旋转
+            # random rotation
             angle = random.uniform(-10, 10)
             image = TF.rotate(image, angle, interpolation=TF.InterpolationMode.BILINEAR)
             mask = TF.rotate(mask, angle, interpolation=TF.InterpolationMode.NEAREST)
             
-            # 随机颜色抖动（仅应用于图像）
+            # random colour dithering
             if random.random() < 0.5:
                 image = TF.adjust_brightness(image, brightness_factor=random.uniform(0.8, 1.2))
                 image = TF.adjust_contrast(image, contrast_factor=random.uniform(0.8, 1.2))
                 image = TF.adjust_saturation(image, saturation_factor=random.uniform(0.8, 1.2))
                 image = TF.adjust_hue(image, hue_factor=random.uniform(-0.1, 0.1))
 
-            # 随机高斯模糊（仅应用于图像）
+            # Random Gaussian Blur
             if random.random() < 0.25:
                 image = TF.gaussian_blur(image, kernel_size=3)
 
-        # 转换为张量并标准化
+        # convert to tensor and normalise
         image = TF.to_tensor(image)
         image = TF.normalize(image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         mask = torch.from_numpy(np.array(mask)).long()
 
-        # 验证形状
-        assert image.shape[0] == 3, f"图像应该有 3 个通道，但得到了 {image.shape[0]}"
-        assert image.shape[1] == image.shape[2] == self.size[0], f"图像应该是大小为 {self.size[0]} 的正方形，但得到了形状 {image.shape}"
-        assert mask.shape == image.shape[1:], f"掩码形状 {mask.shape} 与图像形状 {image.shape[1:]} 不匹配"
+        # Validate shapes
+        assert image.shape[0] == 3, f"Image should have 3 channels, but got {image.shape[0]}"
+        assert image.shape[1] == image.shape[2] == self.size[0], f"Image should be a square of size {self.size[0]}, but got shape {image.shape}"
+        assert mask.shape == image.shape[1:], f"Mask shape {mask.shape} doesn't match image shape {image.shape[1:]}"
 
         return image, mask
