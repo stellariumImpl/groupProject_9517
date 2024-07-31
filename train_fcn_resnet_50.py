@@ -13,8 +13,8 @@ from utils.losses import CombinedLoss
 from utils.log import setup_logger, save_checkpoint
 import torch.nn.functional as F
 from torchvision import models
-from torchvision.models.segmentation import FCN_ResNet50_Weights  # 确保正确导入
-import wandb  # 导入wandb
+from torchvision.models.segmentation import FCN_ResNet50_Weights 
+import wandb  
 
 def train_epoch(model, dataloader, criterion, optimizer, device, num_classes, scaler, accumulation_steps=2):
     model.train()
@@ -98,9 +98,8 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
             total_dice / num_batches)
 
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir, num_classes):
-    # 初始化wandb
     wandb.init(
-        project="wildscenes-segmentation-fcn_resnet50",  # 设置您的项目名称
+        project="wildscenes-segmentation-fcn_resnet50",  
         config={
             "model": "FCN-ResNet50",
             "learning_rate": optimizer.param_groups[0]['lr'],
@@ -135,7 +134,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
 
         scheduler.step()
 
-         # 记录指标到wandb
         wandb.log({
             "epoch": current_epoch,
             "train_loss": train_loss,
@@ -170,7 +168,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         logging.info(f"Current learning rate: {current_lr:.6f}")
 
     logging.info(f"Training completed after {num_epochs} epochs.")
-    wandb.finish()  # 结束wandb运行
+    wandb.finish() 
     return best_model_path
 
 if __name__ == "__main__":
@@ -183,13 +181,11 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logging.info(f"Using device: {device}")
 
-    # 修改数据加载器以使用新的增强
     train_loader = EnhancedWildScenesDataset.get_data_loader('train', batch_size=16)
     val_loader = EnhancedWildScenesDataset.get_data_loader('valid', batch_size=16)
 
     num_classes = 17
 
-    # 加载预训练的FCN模型
     model = models.segmentation.fcn_resnet50(weights=FCN_ResNet50_Weights.COCO_WITH_VOC_LABELS_V1)
     model.classifier[4] = nn.Conv2d(512, num_classes, kernel_size=1)
     model = model.to(device)
