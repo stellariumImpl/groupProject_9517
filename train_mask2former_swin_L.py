@@ -16,7 +16,7 @@ from utils.log import setup_logger, save_checkpoint
 import torch.nn.functional as F
 import math
 from models.custom_mask2former import CustomMask2Former
-import wandb  # 导入wandb
+import wandb  
 
 
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
@@ -43,7 +43,7 @@ def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_
 
         scaler.scale(loss).backward()
 
-        # 调整梯度裁剪的 max_norm 值為0.5
+        # Adjust the max_norm value for gradient clipping to 0.5
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=0.5)
 
         scaler.step(optimizer)
@@ -136,7 +136,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         logging.info(f"Epoch {current_epoch} - Val Loss: {val_loss:.4f}, Val mIoU: {val_miou:.4f}, "
                      f"Val Pixel Acc: {val_pixel_acc:.4f}, Val Dice: {val_dice:.4f}")
 
-        scheduler.step()  # 每个 epoch 结束后调用 scheduler
+        scheduler.step() 
 
         wandb.log({
             "epoch": current_epoch,
