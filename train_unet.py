@@ -14,6 +14,7 @@ from utils.losses import CombinedLoss
 from utils.log import setup_logger, save_checkpoint
 import torch.nn.functional as F
 import wandb 
+# This draws on the Ascetics/Pytorch-SegToolbox framework to split the training and validation processes into separate epoch functions, but the specific implementation details are original
 
 def setup_logger(log_file):
     logging.basicConfig(level=logging.INFO,
