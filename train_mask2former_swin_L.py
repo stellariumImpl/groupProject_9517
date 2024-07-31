@@ -1,4 +1,4 @@
-# 調整 從epoch 30學習率就降低為0了，收斂過快，後期loss浮動沒有明顯下降，mIOU 像素精準度 Dice相關係數也沒有明顯上升
+# need to adjust, from epoch 30, the learning rate is reduced to 0, convergence is too fast, and there is no significant decrease in the late loss float, and there is no significant increase in the mIOU pixel accuracy Dice correlation coefficient.
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -18,7 +18,7 @@ import math
 from models.custom_mask2former import CustomMask2Former
 import wandb  
 
-
+# This draws on the Ascetics/Pytorch-SegToolbox framework to split the training and validation processes into separate epoch functions, but the specific implementation details are original
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
     model.train()
     total_loss = 0
