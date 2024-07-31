@@ -15,7 +15,7 @@ import torch.nn.functional as F
 from torchvision import models
 from torchvision.models.segmentation import FCN_ResNet50_Weights 
 import wandb  
-
+# This draws on the Ascetics/Pytorch-SegToolbox framework to split the training and validation processes into separate epoch functions, but the specific implementation details are original
 def train_epoch(model, dataloader, criterion, optimizer, device, num_classes, scaler, accumulation_steps=2):
     model.train()
     total_loss = 0
