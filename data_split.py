@@ -1,3 +1,4 @@
+# Drawing here on Ascetics/Pytorch-SegToolbox. But we use another version of data split method in data_split_optimizer.py, this part of code is just the previous one
 import pandas as pd
 import os
 import sklearn
@@ -41,6 +42,7 @@ class WildScenesDataset:
         18: 14,  # Water
     }
     def __init__(self, dataset_type, transform=None):
+        # Drawing here on Ascetics/Pytorch-SegToolbox.
         assert dataset_type in ('train', 'valid', 'test')
         self._dataset_type = dataset_type
         self._data_frame = pd.read_csv(WildScenesDataset._csv_files[self._dataset_type])
@@ -53,6 +55,7 @@ class WildScenesDataset:
         if index >= len(self):
             raise IndexError(f"Index {index} out of bounds for dataset of size {len(self)}")
         try:
+            # Drawing here on Ascetics/Pytorch-SegToolbox.
             image_path = self._data_frame['image'].iloc[index]
             label_path = self._data_frame['label'].iloc[index]
 
@@ -78,6 +81,7 @@ class WildScenesDataset:
         Traverse server image and label directories and yield image and label paths.
         :return: Generator yielding (image path, label path)
         """
+        # Drawing here on Ascetics/Pytorch-SegToolbox.
         data_err = 'data error. check!'
         image_base = WildScenesDataset.image_file_base
         label_base = WildScenesDataset.label_file_base
