@@ -13,7 +13,7 @@ from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calcul
 from utils.losses import CombinedLoss
 from utils.log import setup_logger, save_checkpoint
 import torch.nn.functional as F
-import wandb  # 导入wandb
+import wandb 
 
 def setup_logger(log_file):
     logging.basicConfig(level=logging.INFO,
@@ -104,9 +104,8 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
             total_dice / num_batches)
 
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir):
-    # 初始化wandb
     wandb.init(
-        project="wildscenes-segmentation-unet",  # 设置您的项目名称
+        project="wildscenes-segmentation-unet",  
         config={
             "model": "UNet",
             "learning_rate": optimizer.param_groups[0]['lr'],
@@ -136,7 +135,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         scheduler.step(val_loss)
 
 
-        # 记录指标到wandb
         wandb.log({
             "epoch": epoch + 1,
             "train_loss": train_loss,
@@ -172,7 +170,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         logging.info(f"Current learning rate: {current_lr:.6f}")
 
     logging.info(f"Training completed after {num_epochs} epochs.")
-    wandb.finish()  # 结束wandb运行
+    wandb.finish() 
     return best_model_path
 
 if __name__ == "__main__":
