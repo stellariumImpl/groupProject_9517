@@ -25,8 +25,8 @@ color_map = {
     12: [208, 245, 71],  # Tree-foliage
     13: [238, 47, 227],  # Tree-trunk
     14: [40, 127, 198],  # Water
-    15: [0, 0, 0],      # 背景类（黑色）
-    16: [128, 128, 128],  # 忽略类（灰色）
+    15: [0, 0, 0],      # Background(black)
+    16: [128, 128, 128],  # Ignore(gray)
 }
 
 def custom_collate(batch):
@@ -35,14 +35,14 @@ def custom_collate(batch):
         for item in batch:
             image, mask = item
             
-            # 确保图像大小一致（使用 224x224 或你希望的任何大小）
+            # Ensure consistent image size
             image = TF.resize(image, (224, 224))
             mask = TF.resize(mask.unsqueeze(0), (224, 224), interpolation=TF.InterpolationMode.NEAREST).squeeze(0)
             
             images.append(image)
             masks.append(mask)
         
-        # 堆叠图像和掩码
+        # Stacking images and masks
         images = torch.stack(images, 0)
         masks = torch.stack(masks, 0)
     
@@ -109,13 +109,13 @@ if __name__ == '__main__':
     # 测试data_loader
     train_loader = get_data_loader('train', batch_size=4)
     for images, labels in train_loader:
-        print(f"Batch image shape: {images.shape}") # 一個批次的圖像數據形狀，一個批次4個圖象，每個圖象3通道，每個圖像尺寸256*341
-        print(f"Batch label shape: {labels.shape}") # 一個批次的label數據形狀，單通道，表示的是trainId標注的
+        print(f"Batch image shape: {images.shape}") # Shape of image data for one batch, 4 images per batch, 3 channels per image, size 256 * 341 per image
+        print(f"Batch label shape: {labels.shape}") # The label data shape of a batch, single channel, represents the trainId annotation
         print(f"Batch label unique values: {torch.unique(labels)}")
         break
 
     dataset = EnhancedWildScenesDataset('train')
     image, label = dataset[0]
     color_coded_label = dataset.get_color_coded_label(label.numpy())
-    print(f"Color-coded label shape: {color_coded_label.shape}") # 使用顔色編碼的label圖像形狀，發現是3通道，成了！
+    print(f"Color-coded label shape: {color_coded_label.shape}") # The shape of the label image using color coding was found to be 3-channel, and it became!
     
