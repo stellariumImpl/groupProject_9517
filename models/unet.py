@@ -48,7 +48,7 @@ class Up(nn.Module):
 
     def forward(self, x1, x2):
         x1 = self.up(x1)
-        # 确保输入 x1 和 x2 的形状相同
+        # Ensure that inputs x1 and x2 have the same shape
         x1 = F.interpolate(x1, size=x2.shape[2:], mode='bilinear', align_corners=True)
         x = torch.cat([x2, x1], dim=1)
         return self.conv(x)
