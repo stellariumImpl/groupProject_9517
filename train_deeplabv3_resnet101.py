@@ -14,7 +14,7 @@ import torch.nn.functional as F
 import wandb  
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-
+# This draws on the Ascetics/Pytorch-SegToolbox framework to split the training and validation processes into separate epoch functions, but the specific implementation details are original
 
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, device, num_classes, scaler):
     model.train()
