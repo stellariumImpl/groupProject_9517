@@ -11,7 +11,7 @@ from utils.metrics import calculate_miou_train, calculate_pixel_accuracy, calcul
 from utils.losses import CombinedLoss
 from models.custom_deeplabv3 import CustomDeepLabV3
 import torch.nn.functional as F
-import wandb  # 导入wandb
+import wandb  
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
@@ -104,7 +104,6 @@ def validate_epoch(model, dataloader, criterion, device, num_classes):
 
 
 def save_checkpoint(model, optimizer, epoch, metrics, filename):
-    # 保存检查点
     state = {
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
@@ -115,7 +114,6 @@ def save_checkpoint(model, optimizer, epoch, metrics, filename):
 
 
 def setup_logger(log_file):
-    # 设置日志记录器
     logging.basicConfig(filename=log_file, level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
     console = logging.StreamHandler()
@@ -126,9 +124,8 @@ def setup_logger(log_file):
 
 
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device, save_dir, num_classes):
-    # 初始化wandb
     wandb.init(
-        project="wildscenes-segmentation-deeplabv3_resnet101",  # 设置您的项目名称
+        project="wildscenes-segmentation-deeplabv3_resnet101",  
         config={
             "model": "CustomDeepLabV3",
             "learning_rate": optimizer.param_groups[0]['lr'],
@@ -140,7 +137,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         }
     )
     
-    # 训练模型的主函数
     best_miou = 0
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -163,7 +159,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
 
 
 
-        # 记录指标到wandb
         wandb.log({
             "epoch": current_epoch,
             "train_loss": train_loss,
@@ -198,16 +193,14 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_
         logging.info(f"Current learning rate: {current_lr:.6f}")
 
     logging.info(f"Training completed after {num_epochs} epochs.")
-    wandb.finish()  # 结束wandb运行
+    wandb.finish() 
     return best_model_path
 
 
 if __name__ == "__main__":
-    # 创建保存目录
     save_dir = os.path.join('model_checkpoints', 'DeepLabV3 ResNet 101')
     os.makedirs(save_dir, exist_ok=True)
 
-    # 设置日志文件路径
     log_file = os.path.join(save_dir, 'training.log')
     setup_logger(log_file)
 
@@ -221,14 +214,11 @@ if __name__ == "__main__":
 
     num_classes = 17
 
-    # 选择模型
     model = CustomDeepLabV3(num_classes=num_classes).to(device)
 
-    # 选择损失函数
     # criterion = FocalLoss(alpha=1, gamma=2)
     criterion = CombinedLoss(weight_focal=1.0, weight_dice=0.5)
 
-    # 选择优化器
     # optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0001, nesterov=True)
     optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.01)
 
